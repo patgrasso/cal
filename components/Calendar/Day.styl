@@ -1,0 +1,40 @@
+
+@import "../_constants"
+
+.calendar-day
+  position: relative
+  border-right: 1px solid lightgray
+  height: hour-cell-height*24
+
+  background-image: linear-gradient(to top, lightgray 1px, transparent 1px)
+  background-size: 1px hour-cell-height
+
+  &:last-of-type, &:first-of-type
+    border: none
+
+  &:after
+    position: absolute
+    content: ''
+    height: 100%
+    width: 100%
+    background-image: linear-gradient(to right, #fff 1px, transparent 2px),
+                      linear-gradient(to top, lightgray 1px, transparent 1px)
+    background-size: 3px hour-cell-height*0.5
+    z-index: -1
+
+.calendar-day, .calendar-day-header
+  flex-basis: 100%
+  flex-grow: 1
+  flex-shrink: 1
+  position: relative
+
+.calendar-day-header
+  height: header-height
+  text-align: center
+
+.current-time-marker
+  position: absolute
+  height: 2px
+  width: 100%
+  background-color: red
+  z-index: 3
