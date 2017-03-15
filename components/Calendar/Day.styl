@@ -6,8 +6,9 @@
   border-right: 1px solid lightgray
   height: hour-cell-height*24
 
-  background-image: linear-gradient(to top, lightgray 1px, transparent 1px)
-  background-size: 1px hour-cell-height
+  background-image: linear-gradient(to right, #fff 1px, transparent 2px),
+                    linear-gradient(to top, lightgray 1px, transparent 1px)
+  background-size: 3px hour-cell-height*0.5
 
   &:last-of-type, &:first-of-type
     border: none
@@ -17,10 +18,13 @@
     content: ''
     height: 100%
     width: 100%
-    background-image: linear-gradient(to right, #fff 1px, transparent 2px),
+    background-image: linear-gradient(to top, lightgray 1px, transparent 1px)
+    background-size: 1px hour-cell-height
+
+  &.today
+    background-color: #eee
+    background-image: linear-gradient(to right, #eee 1px, transparent 2px),
                       linear-gradient(to top, lightgray 1px, transparent 1px)
-    background-size: 3px hour-cell-height*0.5
-    z-index: -1
 
 .calendar-day, .calendar-day-header
   flex-basis: 100%

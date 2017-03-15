@@ -5,19 +5,30 @@ class Calendar extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      viewType: ViewTypes.WEEK,
-      events: [{ start: new Date( 2017, 2, 14, 17 ),
-                 end:   new Date( 2017, 2, 14, 18, 30 )  }]
-    };
+    this.state = { viewType: ViewTypes.WEEK };
   }
 
   render() {
     let View = this.state.viewType;
 
+    let visibleCals = this
+      .props.calendars
+      .filter((cal) => cal.visible)
+      .map((cal) => cal.id);
+
+    // Filter out events on hidden calendars
+    let events = this
+      .props.events
+      .filter((event) => visibleCals.includes(event.calendarId));
+
+    console.log(this.props.events);
+
     return (
       <section className="calendar-container">
-        <View events={this.state.events} style={{'background-color': 'red'}}/>
+        <View
+          events={events}
+          calendars={this.props.calendars}
+          style={{'background-color': 'red'}}/>
       </section>
     );
   }

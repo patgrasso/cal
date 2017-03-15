@@ -19,3 +19,30 @@ module.exports.timeInHours = () => {
   return now.getHours() + now.getMinutes() / 60;
 };
 
+module.exports.capitalize = (str) => {
+  return str
+    .split(' ')
+    .map((substr) => substr[0].toUpperCase() + substr.slice(1))
+    .join(' ');
+};
+
+module.exports.categorize = (things, property) => {
+  let categories = {};
+
+  things.forEach((thing) => {
+    if (!(thing[property] in categories)) {
+      categories[thing[property]] = [];
+    }
+    categories[thing[property]].push(thing);
+  });
+
+  return categories;
+};
+
+module.exports.formatTime = (date) => {
+  let suffix = (date.getHours() < 12) ? 'a' : 'p';
+  let minutes = date.getMinutes();
+  minutes = (minutes < 10) ? '0' + minutes : minutes;
+  return `${date.getHours() % 13}:${minutes}${suffix}`;
+};
+

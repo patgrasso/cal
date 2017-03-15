@@ -44,7 +44,7 @@ class Day extends React.Component {
     );
 
     return (
-      <div className="calendar-day">
+      <div className={'calendar-day' + (this.props.today ? ' today' : '')}>
         {calEvents}
         {this.props.today ? currentTimeMarker : null}
       </div>
