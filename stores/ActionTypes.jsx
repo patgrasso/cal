@@ -1,4 +1,5 @@
 export const CalendarActionTypes = {
+  UPDATE_CALENDARS: 'UPDATE_CALENDARS',
   CREATE_CALENDAR: 'CREATE_CALENDAR',
   REMOVE_CALENDAR: 'REMOVE_CALENDAR',
   SET_NAME: 'SET_NAME',
@@ -7,6 +8,7 @@ export const CalendarActionTypes = {
 };
 
 export const EventActionTypes = {
+  UPDATE_EVENTS: 'UPDATE_EVENTS',
   CREATE_EVENT: 'CREATE_EVENT',
   REMOVE_EVENT: 'REMOVE_EVENT',
   SET_TITLE: 'SET_TITLE',

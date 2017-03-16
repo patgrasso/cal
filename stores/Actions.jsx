@@ -2,6 +2,13 @@ import {CalendarActionTypes, EventActionTypes} from './ActionTypes';
 import Dispatcher from './dispatchers';
 
 export const CalendarActions = {
+  update(calendars) {
+    Dispatcher.dispatch({
+      type: CalendarActionTypes.UPDATE_CALENDARS,
+      calendars
+    });
+  },
+
   create(name, color='green') {
     Dispatcher.dispatch({
       type: CalendarActionTypes.CREATE_CALENDAR,
@@ -30,6 +37,17 @@ export const CalendarActions = {
 };
 
 export const EventActions = {
+  updateAll(events) {
+    Dispatcher.dispatch({
+      type: EventActionTypes.UPDATE_EVENTS,
+      events
+    });
+  },
+
+  update(event) {
+    EventActions.updateAll([event]);
+  },
+
   create(title, color='green') {
     Dispatcher.dispatch({
       type: EventActionTypes.CREATE_EVENT,

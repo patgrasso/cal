@@ -42,7 +42,14 @@ module.exports.categorize = (things, property) => {
 module.exports.formatTime = (date) => {
   let suffix = (date.getHours() < 12) ? 'a' : 'p';
   let minutes = date.getMinutes();
-  minutes = (minutes < 10) ? '0' + minutes : minutes;
-  return `${date.getHours() % 13}:${minutes}${suffix}`;
+
+  if (minutes === 0) {
+    minutes = '';
+  } else if (minutes < 10) {
+    minutes = ':0' + minutes;
+  } else {
+    minutes = ':' + minutes;
+  }
+  return `${(date.getHours() % 12) || 12}${minutes}${suffix}`;
 };
 

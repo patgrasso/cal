@@ -10,18 +10,18 @@ class Calendar extends React.Component {
 
   render() {
     let View = this.state.viewType;
-
+    let colors = {};
     let visibleCals = this
       .props.calendars
       .filter((cal) => cal.visible)
-      .map((cal) => cal.id);
+      .map(({id, color}) => (colors[id] = color) && id);
 
     // Filter out events on hidden calendars
     let events = this
       .props.events
-      .filter((event) => visibleCals.includes(event.calendarId));
-
-    console.log(this.props.events);
+      .filter((event) => visibleCals.includes(event.calendarId))
+      .map((event) => Object.assign(
+        {}, { color: colors[event.calendarId] }, event));
 
     return (
       <section className="calendar-container">

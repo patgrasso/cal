@@ -2,21 +2,6 @@ import {ReduceStore} from 'flux/utils';
 import Dispatcher from './dispatchers';
 import {EventActionTypes} from './ActionTypes';
 
-const events = [
-  {
-    calendarId: 1,
-    title: 'Dinner',
-    start: new Date( 2017, 2, 14, 19 ),
-    end:   new Date( 2017, 2, 14, 20, 30 )
-  },
-  {
-    calendarId: 2,
-    title: 'Meeting',
-    start: new Date( 2017, 2, 13, 16 ),
-    end:   new Date( 2017, 2, 13, 17 )
-  }
-];
-
 class EventStore extends ReduceStore {
 
   constructor() {
@@ -46,6 +31,16 @@ class EventStore extends ReduceStore {
         }
         calendar.name = action.name;
         return state;
+
+      case EventActionTypes.UPDATE_EVENTS:
+        let ids = action.events.map(({id}) => id);
+        console.log(state
+          .filter(({id}) => !ids.includes(id))
+          .concat(action.events));
+        return state
+          .filter(({id}) => !ids.includes(id))
+          .concat(action.events);
+
 
       default:
         return state;

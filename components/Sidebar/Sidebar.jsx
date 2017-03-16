@@ -1,5 +1,6 @@
 import React from 'react';
 import CalendarList from './CalendarList';
+import GoogleAuth from './GoogleAuth';
 import utils from '../../utils';
 
 class Sidebar extends React.Component {
@@ -13,6 +14,7 @@ class Sidebar extends React.Component {
           onRemoveCalendar={this.props.onRemoveCalendar}
           onToggleCalendar={this.props.onToggleCalendar}
         />
+        <GoogleAuth />
       </section>
     );
   }

@@ -3,7 +3,7 @@ import CalEvent from './CalEvent';
 import { hourCellHeight } from './CalendarConstants';
 import utils from '../../utils';
 
-console.log(utils);
+const TIME_MARKER_UPDATE_MS = 60000;
 
 import './Day.styl';
 
@@ -18,7 +18,7 @@ class Day extends React.Component {
     if (this.props.today) {
       this.timerID = setInterval(
         () => this.setState({ time: utils.timeInHours() }),
-        60000
+        TIME_MARKER_UPDATE_MS
       );
     }
   }
@@ -31,25 +31,23 @@ class Day extends React.Component {
 
   render() {
     let {events, date} = this.props;
-
     let calEvents = events
       .filter(({start}) => start.toDateString() === date.toDateString())
       .map((event, i) => <CalEvent {...event} key={i} />);
-
     let currentTimeMarker = (
       <div
         className="current-time-marker"
         style={{ top: hourCellHeight * this.state.time }}
       />
     );
+    let className = 'calendar-day' + (this.props.today ? ' today' : '');
 
     return (
-      <div className={'calendar-day' + (this.props.today ? ' today' : '')}>
+      <div className={className}>
         {calEvents}
         {this.props.today ? currentTimeMarker : null}
       </div>
     );
-
   }
 
 }

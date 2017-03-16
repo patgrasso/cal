@@ -2,30 +2,6 @@ import {ReduceStore} from 'flux/utils';
 import Dispatcher from './dispatchers';
 import {CalendarActionTypes} from './ActionTypes';
 
-const calendars = [
-  {
-    id: 1,
-    name: 'Patrick Grasso',
-    visible: true,
-    accessRole: 'owner',
-    color: 'green'
-  },
-  {
-    id: 2,
-    name: 'Reslife',
-    visible: false,
-    accessRole: 'owner',
-    color: 'cyan'
-  },
-  {
-    id: 3,
-    name: 'Alpha Sigma Phi',
-    visible: true,
-    accessRole: 'writer',
-    color: 'red'
-  }
-];
-
 const findCalendar = (id, state) => {
   let calendar = state.find((cal) => cal.id === id);
 
@@ -43,7 +19,7 @@ class CalendarStore extends ReduceStore {
   }
 
   getInitialState() {
-    return calendars;
+    return [];
   }
 
   // TODO: hook up with google calendar
@@ -59,6 +35,12 @@ class CalendarStore extends ReduceStore {
       case CalendarActionTypes.SET_NAME:
         findCalendar(action.id, state).name = action.name;
         return state.slice();
+
+      case CalendarActionTypes.UPDATE_CALENDARS:
+        let ids = action.calendars.map(({id}) => id);
+        return state
+          .filter(({id}) => !ids.includes(id))
+          .concat(action.calendars);
 
       case CalendarActionTypes.TOGGLE_VISIBILITY:
         let calendar = findCalendar(action.id, state);
