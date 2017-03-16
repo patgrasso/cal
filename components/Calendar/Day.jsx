@@ -31,21 +31,32 @@ class Day extends React.Component {
 
   render() {
     let {events, date} = this.props;
-    let calEvents = events
+    let clazz = 'calendar-day' + (!this.props.timeSinceToday ? ' today' : '');
+
+    let evs = utils.events.reconcile(events
       .filter(({start}) => start.toDateString() === date.toDateString())
-      .map((event, i) => <CalEvent {...event} key={i} />);
-    let currentTimeMarker = (
-      <div
-        className="current-time-marker"
-        style={{ top: hourCellHeight * this.state.time }}
-      />
-    );
-    let className = 'calendar-day' + (this.props.today ? ' today' : '');
+      .filter(({allDay}) => !allDay));
+
+    console.log(date.getDay(), evs);
+
+    let calEvents = utils.events.reconcile(events
+      .filter(({start}) => start.toDateString() === date.toDateString())
+      .filter(({allDay}) => !allDay))
+      .map(({event, left, size}, i) => (
+
+        <CalEvent {...event} left={left} size={size} key={i} />
+
+      ));
 
     return (
-      <div className={className}>
+      <div className={clazz}>
         {calEvents}
-        {this.props.today ? currentTimeMarker : null}
+        {this.props.timeSinceToday ? '' :
+          <div
+            className="current-time-marker"
+            style={{ top: hourCellHeight * this.state.time }}
+          ></div>
+        }
       </div>
     );
   }

@@ -14,7 +14,8 @@ class CalendarCheckbox extends React.Component {
       <li className="calendar-checkbox" onClick={this.onChanged.bind(this)}>
         <div
           className="checkbox"
-          style={{backgroundColor: visible ? color : ''}}
+          style={{backgroundColor: visible ? color : '',
+                  borderColor: visible ? color : ''}}
         />
         <span>{name}</span>
       </li>

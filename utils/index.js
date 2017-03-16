@@ -14,11 +14,6 @@ module.exports.join = (items) => {
   return [].concat.apply([], items);
 };
 
-module.exports.timeInHours = () => {
-  let now = new Date();
-  return now.getHours() + now.getMinutes() / 60;
-};
-
 module.exports.capitalize = (str) => {
   return str
     .split(' ')
@@ -26,30 +21,6 @@ module.exports.capitalize = (str) => {
     .join(' ');
 };
 
-module.exports.categorize = (things, property) => {
-  let categories = {};
-
-  things.forEach((thing) => {
-    if (!(thing[property] in categories)) {
-      categories[thing[property]] = [];
-    }
-    categories[thing[property]].push(thing);
-  });
-
-  return categories;
-};
-
-module.exports.formatTime = (date) => {
-  let suffix = (date.getHours() < 12) ? 'a' : 'p';
-  let minutes = date.getMinutes();
-
-  if (minutes === 0) {
-    minutes = '';
-  } else if (minutes < 10) {
-    minutes = ':0' + minutes;
-  } else {
-    minutes = ':' + minutes;
-  }
-  return `${(date.getHours() % 12) || 12}${minutes}${suffix}`;
-};
+module.exports.events = require('./events');
+Object.assign(module.exports, require('./time'));
 

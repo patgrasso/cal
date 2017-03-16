@@ -37,7 +37,7 @@ class WeekView extends React.Component {
     let dayColumns = utils.range(7).map((i) => (
       <Day
         date={getDateForDay(i)}
-        today={i === now.getDay()}
+        timeSinceToday={i - now.getDay()}
         events={this.props.events}
         key={i}
       />

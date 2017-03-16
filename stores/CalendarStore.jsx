@@ -45,7 +45,6 @@ class CalendarStore extends ReduceStore {
       case CalendarActionTypes.TOGGLE_VISIBILITY:
         let calendar = findCalendar(action.id, state);
         calendar.visible = !calendar.visible;
-        console.log(calendar);
         return state.slice();
 
       default:

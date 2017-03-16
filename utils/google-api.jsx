@@ -49,8 +49,14 @@ export const getEvents = (calendarId) => {
           timeMax: endOfWeek(),
           maxResults: 2500
         })
-        .then(
-          ({result}) => resolve(result.items.map((item) => {
+        .then(({result}) => {
+          // Filter out recurring events for which there is an exception
+          let uniqueItems = result.items.filter(
+            (item) => !result.items.find(
+              (other) => other.id === item.recurringEventId));
+
+          // Strip out unneeded information
+          let strippedItems = uniqueItems.map((item) => {
             let startTime = new Date(item.start.dateTime || item.start.date);
             let endTime = new Date(item.end.dateTime || item.end.date);
 
@@ -64,10 +70,13 @@ export const getEvents = (calendarId) => {
               id: item.id,
               title: item.summary,
               start: startTime,
-              end: endTime
+              allDay: item.start.dateTime == null,
+              end: endTime,
+              sync: ['google']
             };
-          })),
-          (error) => reject(error)
-        );
+          });
+
+          resolve(strippedItems);
+        }, (error) => reject(error));
   });
 };

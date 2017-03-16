@@ -34,9 +34,6 @@ class EventStore extends ReduceStore {
 
       case EventActionTypes.UPDATE_EVENTS:
         let ids = action.events.map(({id}) => id);
-        console.log(state
-          .filter(({id}) => !ids.includes(id))
-          .concat(action.events));
         return state
           .filter(({id}) => !ids.includes(id))
           .concat(action.events);
