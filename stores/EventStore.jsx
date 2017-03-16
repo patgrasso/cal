@@ -9,7 +9,7 @@ class EventStore extends ReduceStore {
   }
 
   getInitialState() {
-    return events;
+    return [];
   }
 
   // TODO: hook up with google calendar
