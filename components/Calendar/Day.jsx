@@ -37,14 +37,18 @@ class Day extends React.Component {
       .filter(({start}) => start.toDateString() === date.toDateString())
       .filter(({allDay}) => !allDay));
 
-    console.log(date.getDay(), evs);
-
     let calEvents = utils.events.reconcile(events
       .filter(({start}) => start.toDateString() === date.toDateString())
       .filter(({allDay}) => !allDay))
       .map(({event, left, size}, i) => (
 
-        <CalEvent {...event} left={left} size={size} key={i} />
+        <CalEvent
+          {...event}
+          left={left}
+          size={size}
+          key={i}
+          onClick={this.props.openModal}
+        />
 
       ));
 

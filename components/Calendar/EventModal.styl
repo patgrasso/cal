@@ -1,0 +1,42 @@
+
+@import "../_constants"
+
+.event-modal
+  position: absolute
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+  width: 50%
+  height: 50%
+  z-index: 100
+  padding: 20px
+  outline: none
+
+  background-color: default
+  border-radius: 3px
+  font-family: 'Roboto Mono';
+
+  input
+    font-family: 'Roboto Mono';
+    background-color: transparent
+    border: none
+    border-bottom: 2px solid rgba(0, 0, 0, 0.2)
+    outline: none
+
+  .event-title
+    font-size: 20px
+    margin-bottom: 10px
+
+  .event-detail
+    font-size: 16px
+    margin-bottom: 10px
+    display: table
+    width: 100%
+
+    label
+      display: table-cell
+      width: 120px
+
+    input
+      display: table-cell
+      width: 100%

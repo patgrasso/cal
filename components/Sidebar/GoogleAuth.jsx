@@ -42,6 +42,12 @@ class GoogleAuth extends React.Component {
 
   updateSigninStatus(isSignedIn) {
     this.setState({ isSignedIn });
+    if (!isSignedIn) {
+      EventActions.wipe();
+      CalendarActions.wipe();
+    } else {
+      this.updateCalendar();
+    }
   }
 
   updateCalendar() {
@@ -53,15 +59,19 @@ class GoogleAuth extends React.Component {
 
   render() {
     return (
-      <div className="google-auth">
+      <div className="google-auth sidebar-widget">
+        <h2 className="sidebar-widget-name">Google</h2>
         <button
           id="google-authorize"
+          className="success"
           onClick={this.handleAuthClick}
           disabled={this.state.isSignedIn}
-        >Authorize</button>
+        >Sign In</button>
         <button
           id="google-signout"
+          className="error"
           onClick={this.handleSignoutClick}
+          disabled={!this.state.isSignedIn}
         >Sign Out</button>
       </div>
     );

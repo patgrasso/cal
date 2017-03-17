@@ -34,10 +34,20 @@ class EventStore extends ReduceStore {
 
       case EventActionTypes.UPDATE_EVENTS:
         let ids = action.events.map(({id}) => id);
-        return state
-          .filter(({id}) => !ids.includes(id))
-          .concat(action.events);
 
+        state = state.slice();
+        action.events.forEach((event) => {
+          let found = state.find(({id}) => id === event.id);
+          if (found) {
+            Object.assign(found, event);
+          } else {
+            state.push(event);
+          }
+        });
+        return state;
+
+      case EventActionTypes.WIPE_EVENTS:
+        return [];
 
       default:
         return state;

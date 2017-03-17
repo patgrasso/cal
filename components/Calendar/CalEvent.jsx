@@ -6,25 +6,34 @@ import './CalEvent.styl';
 
 class CalEvent extends React.Component {
 
+  onClick(e) {
+    e.stopPropagation();
+    this.props.onClick(this.props.id);
+  }
+
   render() {
     let {start, end, title, color, size, left} = this.props;
-    let timeStart = start.getHours() + start.getMinutes() / 60;
-    let timeEnd = end.getHours() + end.getMinutes() / 60;
+    let timeStart = utils.timeInHours(start);
+    let timeEnd = utils.timeInHours(end);
     let pxFromTop = timeStart * hourCellHeight - 1;
     let pxHeight = (timeEnd - timeStart) * hourCellHeight - 4;
 
+    let clazz = 'calendar-event' + (end < Date.now() ? ' past' : '');
+
     return (
       <div
-        className="calendar-event"
+        className={clazz}
         style={{backgroundColor: color,
                 top: pxFromTop,
                 height: pxHeight,
                 left: (100 / size * (left - 1)) + '%',
                 width: (100 / ((size - 1) || 1)) + '%',
-                zIndex: left}}>
+                zIndex: left}}
+        onClick={this.onClick.bind(this)}
+      >
         <strong>
           {utils.formatTime(start)}
-          -
+          {' - '}
           {utils.formatTime(end)}
         </strong>
         <p>{title}</p>

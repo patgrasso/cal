@@ -16,15 +16,6 @@ const endOfWeek = () => {
   return d.toISOString();
 };
 
-const sameDayThisWeek = (date) => {
-  let d = new Date(date);
-  let now = new Date();
-  d.setDate(now.getDate() - now.getDay() + d.getDay());
-  d.setFullYear(now.getFullYear());
-  d.setMonth(now.getMonth());
-  return d;
-};
-
 export const getCalendarList = () => {
   return new Promise((resolve, reject) => {
     gapi.client.calendar.calendarList.list().then(
@@ -40,13 +31,13 @@ export const getCalendarList = () => {
   });
 };
 
-export const getEvents = (calendarId) => {
+export const getEvents = (calendarId, timeFrom, timeTo) => {
   return new Promise((resolve, reject) => {
     gapi.client.calendar.events
         .list({
           calendarId,
-          timeMin: beginningOfWeek(),
-          timeMax: endOfWeek(),
+          timeMin: timeFrom || beginningOfWeek(),
+          timeMax: timeTo || endOfWeek(),
           maxResults: 2500
         })
         .then(({result}) => {
@@ -59,11 +50,9 @@ export const getEvents = (calendarId) => {
           let strippedItems = uniqueItems.map((item) => {
             let startTime = new Date(item.start.dateTime || item.start.date);
             let endTime = new Date(item.end.dateTime || item.end.date);
-
-            if (item.recurrence && item.recurrence[0].includes('FREQ=WEEKLY')) {
-              startTime = sameDayThisWeek(startTime);
-              endTime = sameDayThisWeek(endTime);
-            }
+            let recurrence = item.recurrence && item.recurrence.map(
+              (r) => (/FREQ=(.+?);/).test(r) && r.match(/FREQ=(.+?);/)[1]
+            )[0];
 
             return {
               calendarId,
@@ -72,6 +61,8 @@ export const getEvents = (calendarId) => {
               start: startTime,
               allDay: item.start.dateTime == null,
               end: endTime,
+              location: item.location,
+              recurrence,
               sync: ['google']
             };
           });

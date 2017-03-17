@@ -47,6 +47,9 @@ class CalendarStore extends ReduceStore {
         calendar.visible = !calendar.visible;
         return state.slice();
 
+      case CalendarActionTypes.WIPE_CALENDARS:
+        return [];
+
       default:
         return state;
     }

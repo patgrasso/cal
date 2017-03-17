@@ -18,3 +18,11 @@ module.exports.formatTime = (date) => {
   return `${(date.getHours() % 12) || 12}${minutes}${suffix}`;
 };
 
+module.exports.sameDayForWeek = (date, focusDate) => {
+  let d = new Date(date);
+  focusDate = focusDate || new Date();
+  d.setDate(focusDate.getDate() - focusDate.getDay() + d.getDay());
+  d.setFullYear(focusDate.getFullYear());
+  d.setMonth(focusDate.getMonth());
+  return d;
+};

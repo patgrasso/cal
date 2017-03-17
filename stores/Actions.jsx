@@ -33,6 +33,10 @@ export const CalendarActions = {
       type: CalendarActionTypes.TOGGLE_VISIBILITY,
       id
     });
+  },
+
+  wipe() {
+    Dispatcher.dispatch({ type: CalendarActionTypes.WIPE_CALENDARS })
   }
 };
 
@@ -65,5 +69,9 @@ export const EventActions = {
       type: EventActionTypes.REMOVE_EVENT,
       id
     });
+  },
+
+  wipe() {
+    Dispatcher.dispatch({ type: EventActionTypes.WIPE_EVENTS });
   }
 };

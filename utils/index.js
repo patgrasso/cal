@@ -21,6 +21,6 @@ module.exports.capitalize = (str) => {
     .join(' ');
 };
 
-module.exports.events = require('./events');
-Object.assign(module.exports, require('./time'));
+module.exports.events = require('./events.jsx');
+Object.assign(module.exports, require('./time.jsx'));
 

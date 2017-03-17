@@ -4,7 +4,11 @@
 .calendar-event
   position: absolute
   background-color: orange
-  border: 1px solid darkorange
-  width: 90%
+  border: 1px solid rgba(0, 0, 0, 0.2)
+  max-width: 90%
   z-index: 5
   overflow-y: hidden
+
+
+  &.past
+    opacity: 0.5

@@ -1,5 +1,5 @@
 
-const time = require('./time');
+const time = require('./time.jsx');
 
 const conflicts = (n) => (othn) =>
   (othn.start <= n.start && n.start < othn.end) ||

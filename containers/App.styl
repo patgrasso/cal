@@ -1,5 +1,5 @@
 
-sidebar-width = 200px
+@import "../components/_constants"
 
 #app, body
   padding: 0
@@ -13,17 +13,19 @@ sidebar-width = 200px
 
 main
   width: 100%
+  height: 100%
   font-family: sans-serif
   font-size: 12px
 
-  content
-    width: 100%
+  >content
+    width: calc(100% - 40px)
     display: flex
     flex-direction: row
+    height: "calc(100% - %s - 40px)" % header-height
+    padding: 20px
 
     section
-      padding: 20px
-      height: calc(100% - 40px)
+      height: 100%
 
     .sidebar-container
       flex-basis: sidebar-width
@@ -32,3 +34,44 @@ main
     .calendar-container
       flex-grow: 1
       padding-left: 10px
+      position: relative
+
+
+// default button look-and-feel
+button
+  padding: 10px
+  text-transform: uppercase
+  background-color: blue500
+  border: none
+  border-radius: 3px
+  color: white
+  font-weight: 700
+  margin: 5px
+  cursor: pointer
+  position: relative
+
+button:after
+  position: absolute
+  content: ''
+  top: 0
+  bottom: 0
+  left: 0
+  right: 0
+  border-radius: 3px
+  transition: background-color 0.15s
+  background-color: transparent
+
+button:hover:after
+  background-color: rgba(0, 0, 0, 0.1)
+
+button:active:after
+  background-color: rgba(0, 0, 0, 0.2)
+
+button[disabled]
+  display: none
+
+button.error
+  background-color: red500
+
+button.success
+  background-color: green600

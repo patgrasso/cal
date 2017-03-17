@@ -15,8 +15,8 @@ const dayNames = [
   "Saturday"
 ];
 
-const getDateForDay = (i) => {
-  let date = new Date();
+const getDateForDay = (i, focusDate) => {
+  let date = new Date(focusDate);
   date.setDate(date.getDate() - date.getDay() + i);
   return date;
 };
@@ -33,22 +33,32 @@ class WeekView extends React.Component {
   }
 
   render() {
-    let now = new Date();
+    let {focusDate} = this.props;
     let dayColumns = utils.range(7).map((i) => (
       <Day
-        date={getDateForDay(i)}
-        timeSinceToday={i - now.getDay()}
+        date={getDateForDay(i, focusDate)}
+        timeSinceToday={i - focusDate.getDay()}
         events={this.props.events}
+        openModal={this.props.openModal}
         key={i}
       />
     ));
     let dayHeaders = dayNames.map((name, i) => {
-      let date = getDateForDay(i);
+      let date = getDateForDay(i, focusDate);
       return (
         <div className="calendar-day-header" key={i}>
-          {name} {date.getMonth()}/{date.getDate()}
+          {name} {date.getMonth() + 1}/{date.getDate()}
         </div>
       );
+    });
+
+    // Make recurring events appear this week
+    let {events} = this.props;
+    events.forEach((event) => {
+      if (event.recurrence === 'WEEKLY') {
+        event.start = utils.sameDayForWeek(event.start, focusDate);
+        event.end = utils.sameDayForWeek(event.end, focusDate);
+      }
     });
 
     return (
