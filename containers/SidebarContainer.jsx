@@ -1,8 +1,9 @@
 import React from 'react';
-import {Container} from 'flux/utils';
-import {CalendarActions} from '../stores/Actions';
-import CalendarStore from '../stores/CalendarStore';
+import CalendarActions from '../stores/actions/CalendarActions';
+import CalendarStore from '../stores/CalendarStore2';
 import Sidebar from '../components/Sidebar/Sidebar';
+
+import { Container } from 'flux/utils';
 
 class SidebarContainer extends React.Component {
 
@@ -12,21 +13,16 @@ class SidebarContainer extends React.Component {
 
   static calculateState(prevState) {
     return {
-      calendars: CalendarStore.getState().get('calendars'),
+      calendars: CalendarStore.getState().get('calendarList'),
       createCalendar: CalendarActions.create,
       removeCalendar: CalendarActions.remove,
-      toggleCalendar: CalendarActions.toggle,
+      toggleCalendar: CalendarActions.toggleVisible,
     };
   }
 
   render() {
     return (
-      <Sidebar
-        calendars={this.state.calendars}
-        onCreateCalendar={this.state.createCalendar}
-        onRemoveCalendar={this.state.removeCalendar}
-        onToggleCalendar={this.state.toggleCalendar}
-      />
+      <Sidebar {...this.state} />
     );
   }
 

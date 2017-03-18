@@ -2,7 +2,7 @@ import React from 'react';
 import CalEvent from './CalEvent';
 import utils from '../../utils';
 import uuid from 'uuid';
-import {EventActions, ViewActions} from '../../stores/Actions';
+import EventActions from '../../stores/actions/EventActions';
 import {hourCellHeight} from './CalendarConstants';
 
 const TIME_MARKER_UPDATE_MS = 60000;
@@ -50,10 +50,10 @@ class Day extends React.Component {
       summary: '',
       start: startDate,
       end: endDate,
-      sync: ['local'],
+      synced: { local: false },
       location: ''
     });
-    ViewActions.openEventModal(newId);
+    EventActions.startEditing(newId);
   }
 
   render() {

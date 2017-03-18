@@ -1,5 +1,5 @@
 import React from 'react';
-import {render} from 'react-dom';
+import { render } from 'react-dom';
 import CalendarContainer from './CalendarContainer';
 import SidebarContainer from './SidebarContainer';
 import Header from '../components/Header/Header';

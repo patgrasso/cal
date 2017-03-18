@@ -16,6 +16,13 @@ const CalendarActions = {
       type: CalendarActionTypes.REMOVE_CALENDAR,
       id
     });
+  },
+
+  toggleVisible(id) {
+    Dispatcher.dispatch({
+      type: CalendarActionTypes.TOGGLE_VISIBILITY,
+      id
+    });
   }
 };
 

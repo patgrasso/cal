@@ -1,8 +1,9 @@
 /*global gapi*/
 
 import React from 'react';
-import {CalendarActions, EventActions} from '../../stores/Actions';
-import {getCalendarList, getEvents} from '../../utils/google-api';
+import EventActions from '../../stores/actions/EventActions';
+import CalendarActions from '../../stores/actions/CalendarActions';
+import GoogleProvider from '../../stores/providers/GoogleProvider';
 
 const googleConfig = require('../../client_id.json');
 const scopes = 'https://www.googleapis.com/auth/calendar.readonly';
@@ -51,11 +52,9 @@ class GoogleAuth extends React.Component {
   }
 
   updateCalendar() {
-    getCalendarList().then((cals) => {
+    GoogleProvider.getCalendarList().then((cals) => {
       let primary = cals.find((cal) => cal.primary);
-      CalendarActions.update(cals);
-      CalendarActions.setPrimary(primary && primary.id);
-      cals.forEach(({id}) => getEvents(id).then(EventActions.updateAll));
+      cals.forEach(({id}) => GoogleProvider.getEvents(id));
     });
   }
 

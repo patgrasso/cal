@@ -1,9 +1,9 @@
 import ProviderActionTypes from './actions/ProviderActionTypes';
 import CalendarActionTypes from './actions/CalendarActionTypes';
-import Dispatcher from './dispatchers';
+import Dispatcher from './actions/Dispatcher';
 import providers from './providers';
 
-import { Map } from 'immutable';
+import { Map, fromJS } from 'immutable';
 import { ReduceStore } from 'flux/utils';
 
 const CALENDAR_LIST = 'calendarList';
@@ -16,10 +16,11 @@ class CalendarStore extends ReduceStore {
   }
 
   getInitialState() {
-    return Map({ primaryCal: null, calendars: Map() });
+    return Map({ primaryCal: null, calendarList: Map() });
   }
 
   reduce(state, action) {
+    let cal;
     switch (action.type) {
 
       // provider actions
@@ -35,33 +36,34 @@ class CalendarStore extends ReduceStore {
         calendarList = calendarList.map((cal) =>
           cal.setIn(['synced', action.provider], true));
 
-        return state.mergeIn(CALENDAR_LIST, calendarList)
+        return state.mergeIn([CALENDAR_LIST], calendarList)
                     .set(PRIMARY_CAL, primaryCal && primaryCal.get('id'));
+        return state;
 
       case ProviderActionTypes.CREATE_CALENDAR:
         // create immutable
-        let cal = Map(fromJS([ action.calendar.id, action.calendar ]));
+        cal = Map(fromJS([ action.calendar.id, action.calendar ]));
 
         // set 'synced' for provider
         cal = cal.setIn([action.calendar.id, 'synced', action.provider], true);
 
-        return state.mergeIn(CALENDAR_LIST, cal);
+        return state.mergeIn([CALENDAR_LIST], cal);
 
 
       // user actions
       case CalendarActionTypes.CREATE_CALENDAR:
         // create immutable
-        let calendar = Map(fromJS([action.calendar.id, action.calendar]));
+        cal = Map(fromJS([action.calendar.id, action.calendar]));
 
         // for each provider in 'synced', create the calendar
         // and set the value for that provider to false (not synced yet)
-        calendar = calendar.update('synced', (synced) => {
-          synced.forEach((_, provider) =>
-            providers[provider].createCalendar(action.calendar));
-          return synced.map(() => false);
-        });
+        cal = cal.update('synced', (synced) => synced.map(() => false));
 
-        return state.mergeIn(CALENDAR_LIST, calendar);
+        return state.mergeIn([CALENDAR_LIST], calendar);
+
+      case CalendarActionTypes.TOGGLE_VISIBILITY:
+        let visible = state.getIn([CALENDAR_LIST, action.id, 'visible']);
+        return state.setIn([CALENDAR_LIST, action.id, 'visible'], !visible);
 
 
       default:

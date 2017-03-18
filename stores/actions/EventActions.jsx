@@ -4,18 +4,35 @@ import uuid from 'uuid';
 
 const EventActions = {
   create(event) {
-    details.id = details.id || uuid();
+    event.id = event.id || uuid();
     Dispatcher.dispatch({
       type: EventActionTypes.CREATE_EVENT,
-      event: event
+      event,
+      providers: Object.keys(event.synced)
     });
   },
 
-  remove(id) {
+  remove(event) {
     Dispatcher.dispatch({
       type: EventActionTypes.REMOVE_EVENT,
-      id
+      id: event.id,
+      providers: Object.keys(event.synced)
     });
+  },
+
+  startEditing(id) {
+    Dispatcher.dispatch({ type: EventActionTypes.START_EDITING, id });
+  },
+
+  finishEditing(event) {
+    Dispatcher.dispatch({ type: EventActionTypes.STOP_EDITING });
+    if (event) {
+      Dispatcher.dispatch({
+        type: EventActionTypes.CREATE_EVENT,
+        event,
+        providers: Object.keys(event.synced)
+      });
+    }
   }
 };
 

@@ -2,6 +2,14 @@ import ProviderActionTypes from './ProviderActionTypes';
 import Dispatcher from './Dispatcher';
 
 const ProviderActions = {
+  updateCalendarList(provider, calendarList) {
+    Dispatcher.dispatch({
+      type: ProviderActionTypes.UPDATE_CALENDAR_LIST,
+      provider,
+      calendarList
+    });
+  },
+
   createCalendar(provider, calendar) {
     Dispatcher.dispatch({
       type: ProviderActionTypes.CREATE_CALENDAR,

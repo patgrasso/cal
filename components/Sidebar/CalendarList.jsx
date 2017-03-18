@@ -9,7 +9,7 @@ class CalendarList extends React.Component {
     let calendars = this.props.calendars.toList().toJSON().map((cal, i) => (
       <CalendarCheckbox
         {...cal}
-        onChanged={this.props.onToggleCalendar}
+        onChanged={this.props.toggleCalendar}
         key={i}
       />
     ));

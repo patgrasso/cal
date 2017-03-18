@@ -1,7 +1,9 @@
 import React from 'react';
 import utils from '../../utils';
 import Select from 'react-select';
-import {EventActions} from '../../stores/Actions';
+import DateTimePicker from '../DateTimePicker';
+
+import EventActions from '../../stores/actions/EventActions';
 
 import './EventModal.styl';
 import 'style-loader!css-loader!react-select/dist/react-select.css';
@@ -26,6 +28,16 @@ class EventModal extends React.Component {
     this.setState({event: event.set('summary', target.value)});
   }
 
+  onEventStartChange(date) {
+    let {event} = this.state;
+    this.setState({event: event.set('start', date)});
+  }
+
+  onEventEndChange(date) {
+    let {event} = this.state;
+    this.setState({event: event.set('end', date)});
+  }
+
   onEventLocationChange({target}) {
     let {event} = this.state;
     this.setState({event: event.set('location', target.value)});
@@ -45,12 +57,15 @@ class EventModal extends React.Component {
   }
 
   save() {
-    EventActions.update(this.state.event.toJSON());
+    this.props.dismiss(this.state.event.toJSON());
+  }
+
+  cancel() {
     this.props.dismiss();
   }
 
   remove() {
-    EventActions.remove(this.state.event.get('id'));
+    EventActions.remove(this.state.event.toJSON());
     this.props.dismiss();
   }
 
@@ -58,13 +73,14 @@ class EventModal extends React.Component {
     let {calendars} = this.props;
     let {event} = this.state;
     let {color, summary, start, end, location} = this.state.event.toJSON();
+    let synced = this.state.event.get('synced');
     let calendarOptions = calendars.toList().map((cal) => ({
       value: cal.get('id'),
       label: cal.get('name')
     })).toJSON();
 
     return (
-      <div className="event-modal" onClick={this.props.dismiss}>
+      <div className="event-modal" onClick={this.cancel.bind(this)}>
         <div
           tabIndex="0"
           className="event-modal-body"
@@ -85,11 +101,15 @@ class EventModal extends React.Component {
           </div>
           <div className="event-detail">
             <label>Start:</label>
-            <span>{start.toLocaleString()}</span>
+            <DateTimePicker
+              date={new Date(start)}
+              onChange={this.onEventStartChange.bind(this)} />
           </div>
           <div className="event-detail">
             <label>End:</label>
-            <span>{end}</span>
+            <DateTimePicker
+              date={new Date(end)}
+              onChange={this.onEventEndChange.bind(this)} />
           </div>
           <div className="event-detail">
             <label>Location:</label>
@@ -108,6 +128,10 @@ class EventModal extends React.Component {
               options={calendarOptions}
               onChange={this.onEventCalendarChange.bind(this)}
             />
+          </div>
+          <div className="event-detail">
+            <label>Synced:</label>
+            {synced.map((_, provider) => <p>{provider}</p>)}
           </div>
           <div className="event-action-container">
             <button

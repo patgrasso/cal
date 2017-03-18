@@ -3,7 +3,8 @@ import ViewTypes from './CalendarViewTypes';
 import EventModal from './EventModal';
 import providers from '../../stores/providers';
 import CalendarHeader from './CalendarHeader';
-import {ViewActions} from '../../stores/Actions';
+import EventActions from '../../stores/actions/EventActions';
+import { Map } from 'immutable';
 
 class Calendar extends React.Component {
 
@@ -16,16 +17,15 @@ class Calendar extends React.Component {
   }
 
   componentDidMount() {
-    let {focusDate, viewType} = this.state;
-    providers.fetch(focusDate, viewType.delta);
+    providers.local.getEvents();
   }
 
   openModal(modalEventId) {
-    ViewActions.openEventModal(modalEventId);
+    EventActions.startEditing(modalEventId);
   }
 
-  dismissModal() {
-    ViewActions.closeEventModal();
+  dismissModal(event) {
+    EventActions.finishEditing(event);
   }
 
   moveForward() {
@@ -51,7 +51,7 @@ class Calendar extends React.Component {
   }
 
   render() {
-    let {View} = this.state.viewType;
+    let { View } = this.state.viewType;
     let visibleCals = this
       .props.calendars
       .filter((cal) => cal.get('visible'));
@@ -64,7 +64,7 @@ class Calendar extends React.Component {
         'color', visibleCals.getIn([event.get('calendarId'), 'color'])));
 
     // Construct the event modal if need be
-    let modalEvent = events.get(this.props.modalEventId);
+    let modalEvent = events.get(this.props.currentlyEditing);
 
     return (
       <section className="calendar-container">

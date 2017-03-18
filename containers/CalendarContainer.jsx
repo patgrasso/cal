@@ -1,23 +1,23 @@
 import React from 'react';
 import {Container} from 'flux/utils';
-import {EventActions, CalendarActions} from '../stores/Actions';
-import CalendarStore from '../stores/CalendarStore';
-import EventStore from '../stores/EventStore';
-import ViewStore from '../stores/ViewStore';
+import EventActions from '../stores/actions/EventActions';
+import CalendarActions from '../stores/actions/CalendarActions';
+import CalendarStore from '../stores/CalendarStore2';
+import EventStore from '../stores/EventStore2';
 import Calendar from '../components/Calendar/Calendar';
 
 class CalendarContainer extends React.Component {
 
   static getStores() {
-    return [CalendarStore, EventStore, ViewStore];
+    return [CalendarStore, EventStore];
   }
 
   static calculateState(prevState) {
     return {
-      calendars: CalendarStore.getState().get('calendars'),
+      calendars: CalendarStore.getState().get('calendarList'),
       primaryCal: CalendarStore.getState().get('primaryCal'),
-      events: EventStore.getState(),
-      viewProps: ViewStore.getState(),
+      events: EventStore.getState().get('events'),
+      currentlyEditing: EventStore.getState().get('editing'),
       createEvent: EventActions.create,
       removeEvent: EventActions.remove
     };
@@ -25,14 +25,7 @@ class CalendarContainer extends React.Component {
 
   render() {
     return (
-      <Calendar
-        calendars={this.state.calendars}
-        primaryCal={this.state.primaryCal}
-        events={this.state.events}
-        {...this.state.viewProps.toJSON()}
-        onCreateEvent={this.state.createEvent}
-        onRemoveEvent={this.state.removeEvent}
-      />
+      <Calendar {...this.state} />
     );
   }
 
