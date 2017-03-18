@@ -38,3 +38,19 @@ module.exports.sameDayForWeek = (date, focusDate) => {
   d.setMonth(focusDate.getMonth());
   return d;
 };
+
+module.exports.beginningOfWeek = () => {
+  let d = new Date();
+  d.setDate(d.getDate() - d.getDay());
+  d.setHours(0);
+  d.setMinutes(0);
+  return d.toISOString();
+};
+
+module.exports.endOfWeek = () => {
+  let d = new Date();
+  d.setDate(d.getDate() - d.getDay() + 7);
+  d.setHours(0);
+  d.setMinutes(0);
+  return d.toISOString();
+};

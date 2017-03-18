@@ -1,20 +1,7 @@
 /*global gapi*/
 
-const beginningOfWeek = () => {
-  let d = new Date();
-  d.setDate(d.getDate() - d.getDay());
-  d.setHours(0);
-  d.setMinutes(0);
-  return d.toISOString();
-};
-
-const endOfWeek = () => {
-  let d = new Date();
-  d.setDate(d.getDate() - d.getDay() + 7);
-  d.setHours(0);
-  d.setMinutes(0);
-  return d.toISOString();
-};
+const time = require('./time');
+const { beginningOfWeek, endOfWeek } = time;
 
 export const getCalendarList = () => {
   return new Promise((resolve, reject) => {
