@@ -32,17 +32,14 @@ class WeekView extends React.Component {
     body.scrollTop = (body.scrollHeight - body.clientHeight) / 2;
   }
 
+  getMousePosition(e) {
+    let viewTop = this.refs.body.getBoundingClientRect().top;
+    let scrollTop = this.refs.body.scrollTop;
+    return e.pageY - viewTop + scrollTop;
+  }
+
   render() {
-    let {focusDate} = this.props;
-    let dayColumns = utils.range(7).map((i) => (
-      <Day
-        date={getDateForDay(i, focusDate)}
-        timeSinceToday={i - focusDate.getDay()}
-        events={this.props.events}
-        openModal={this.props.openModal}
-        key={i}
-      />
-    ));
+    let {focusDate, events, primaryCal} = this.props;
     let dayHeaders = dayNames.map((name, i) => {
       let date = getDateForDay(i, focusDate);
       return (
@@ -53,13 +50,23 @@ class WeekView extends React.Component {
     });
 
     // Make recurring events appear this week
-    let {events} = this.props;
-    events.forEach((event) => {
-      if (event.recurrence === 'WEEKLY') {
-        event.start = utils.sameDayForWeek(event.start, focusDate);
-        event.end = utils.sameDayForWeek(event.end, focusDate);
-      }
-    });
+    events = events.map(
+      (event) => event.get('recurrence') === 'WEEKLY'
+             ? event.update('start', (s) => utils.sameDayForWeek(s, focusDate))
+                    .update('end', (e) => utils.sameDayForWeek(e, focusDate))
+             : event);
+
+    let dayColumns = utils.range(7).map((i) => (
+      <Day
+        date={getDateForDay(i, focusDate)}
+        primaryCal={primaryCal}
+        events={events}
+        openModal={this.props.openModal}
+        getMousePosition={this.getMousePosition.bind(this)}
+        key={i}
+      />
+    ));
+
 
     return (
       <div className="calendar-weekview">

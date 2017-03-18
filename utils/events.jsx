@@ -9,20 +9,19 @@ const groupSize = (n) => (n == null)
   : n.size = Math.max(n.left, ...n.children.map(groupSize));
 
 function reconcile(events) {
-  if (events.length <= 0) {
+  if (events.size <= 0) {
     return events;
   }
-  events = events.slice();
-  events.sort((a, b) => a.end < b.end);
-  events.sort((a, b) => a.start > b.start);
+  events = events.sort((a, b) => a.get('end') < b.get('end'));
+  events = events.sort((a, b) => a.get('start') > b.get('start'));
 
   let nodes = events.map((event) => ({
     event,
-    start: time.timeInHours(event.start),
-    end: time.timeInHours(event.end),
+    start: time.timeInHours(event.get('start')),
+    end: time.timeInHours(event.get('end')),
     left: 0,
     children: []
-  }));
+  })).toJSON();
   let root = null;
   let placed = [];
   let used = [];

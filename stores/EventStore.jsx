@@ -1,6 +1,8 @@
 import {ReduceStore} from 'flux/utils';
-import Dispatcher from './dispatchers';
 import {EventActionTypes} from './ActionTypes';
+import {Map} from 'immutable';
+import Dispatcher from './dispatchers';
+import providers from './providers';
 
 class EventStore extends ReduceStore {
 
@@ -9,45 +11,29 @@ class EventStore extends ReduceStore {
   }
 
   getInitialState() {
-    return [];
+    return Map();
   }
 
-  // TODO: hook up with google calendar
   reduce(state, action) {
     switch (action.type) {
       case EventActionTypes.CREATE_EVENT:
-        // TODO: Error check
-        return state.concat(action.details);
+        return state.set(action.details.id, Map(action.details));
 
-      case EventActionTypes.REMOVE_CALENDAR:
-        return state.filter((cal) => cal.id !== action.id);
+      case EventActionTypes.REMOVE_EVENT:
+        return state.delete(action.id);
 
-      case EventActionTypes.SET_NAME:
-        let calendar = state.find((cal) => cal.id === action.id);
-
-        if (calendar == null) {
-          throw new ReferenceError(
-            `Cannot find calendar with id: ${action.id}`);
-        }
-        calendar.name = action.name;
-        return state;
+      case EventActionTypes.SET_SUMMARY:
+        return state.update(
+          action.id, (item) => item.set('summary', action.summary));
 
       case EventActionTypes.UPDATE_EVENTS:
-        let ids = action.events.map(({id}) => id);
-
-        state = state.slice();
-        action.events.forEach((event) => {
-          let found = state.find(({id}) => id === event.id);
-          if (found) {
-            Object.assign(found, event);
-          } else {
-            state.push(event);
-          }
-        });
-        return state;
+        return action.events.reduce(
+          (state, event) => state.update(
+            event.id, (existing) => (existing || Map()).merge(event)),
+          state);
 
       case EventActionTypes.WIPE_EVENTS:
-        return [];
+        return state.clear();
 
       default:
         return state;
@@ -56,4 +42,15 @@ class EventStore extends ReduceStore {
 
 }
 
-export default new EventStore();
+const eventStore = new EventStore();
+
+eventStore.addListener(() => {
+  let events = eventStore.getState();
+  providers.providers.forEach(
+    (provider) => providers.sync(
+      events.filter((event) => event.get('sync').includes(provider))
+            .toJSON(),
+      provider));
+});
+
+export default eventStore;

@@ -2,8 +2,8 @@ import React from 'react';
 import ViewTypes from './CalendarViewTypes';
 import EventModal from './EventModal';
 import providers from '../../stores/providers';
-
-import './Calendar.styl';
+import CalendarHeader from './CalendarHeader';
+import {ViewActions} from '../../stores/Actions';
 
 class Calendar extends React.Component {
 
@@ -11,17 +11,21 @@ class Calendar extends React.Component {
     super(props);
     this.state = {
       viewType: ViewTypes.WEEK,
-      modalEventId: null,
       focusDate: new Date()
     };
   }
 
+  componentDidMount() {
+    let {focusDate, viewType} = this.state;
+    providers.fetch(focusDate, viewType.delta);
+  }
+
   openModal(modalEventId) {
-    this.setState({ modalEventId });
+    ViewActions.openEventModal(modalEventId);
   }
 
   dismissModal() {
-    this.setState({ modalEventId: null });
+    ViewActions.closeEventModal();
   }
 
   moveForward() {
@@ -42,43 +46,37 @@ class Calendar extends React.Component {
     providers.fetch(d, viewType.delta);
   }
 
+  onChangeViewType(viewType) {
+    this.setState({ viewType });
+  }
+
   render() {
     let {View} = this.state.viewType;
-    let colors = {};
     let visibleCals = this
       .props.calendars
-      .filter((cal) => cal.visible)
-      .map(({id, color}) => (colors[id] = color) && id);
+      .filter((cal) => cal.get('visible'));
 
     // Filter out events on hidden calendars
     let events = this
       .props.events
-      .filter((event) => visibleCals.includes(event.calendarId))
-      .map((event) => Object.assign(
-        {}, { color: colors[event.calendarId] }, event));
+      .filter((event) => visibleCals.has(event.get('calendarId')))
+      .map((event) => event.set(
+        'color', visibleCals.getIn([event.get('calendarId'), 'color'])));
 
     // Construct the event modal if need be
-    let {modalEventId} = this.state;
-    let modalEvent = events.find(({id}) => id === modalEventId);
+    let modalEvent = events.get(this.props.modalEventId);
 
     return (
-      <section
-        className="calendar-container"
-        onClick={this.dismissModal.bind(this)}
-      >
-        <header className="calendar-header">
-          <button
-            className="move-backward"
-            onClick={this.moveBackward.bind(this)}
-          ><i className="fa fa-arrow-left"></i></button>
-          <button
-            className="move-forward"
-            onClick={this.moveForward.bind(this)}
-          ><i className="fa fa-arrow-right"></i></button>
-        </header>
+      <section className="calendar-container">
+        <CalendarHeader
+          moveForward={this.moveForward.bind(this)}
+          moveBackward={this.moveBackward.bind(this)}
+          onChangeViewType={this.onChangeViewType.bind(this)}
+        />
         <View
           events={events}
           calendars={this.props.calendars}
+          primaryCal={this.props.primaryCal}
           focusDate={this.state.focusDate}
           openModal={this.openModal.bind(this)}
           style={{'background-color': 'red'}}
@@ -86,6 +84,7 @@ class Calendar extends React.Component {
         {modalEvent ?
          <EventModal
            event={modalEvent}
+           calendars={this.props.calendars}
            dismiss={this.dismissModal.bind(this)}
          /> : null}
       </section>

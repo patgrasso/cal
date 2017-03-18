@@ -12,13 +12,13 @@ class CalEvent extends React.Component {
   }
 
   render() {
-    let {start, end, title, color, size, left} = this.props;
+    let {start, end, summary, color, size, left} = this.props;
     let timeStart = utils.timeInHours(start);
     let timeEnd = utils.timeInHours(end);
     let pxFromTop = timeStart * hourCellHeight - 1;
     let pxHeight = (timeEnd - timeStart) * hourCellHeight - 4;
 
-    let clazz = 'calendar-event' + (end < Date.now() ? ' past' : '');
+    let clazz = 'calendar-event' + (new Date(end) < Date.now() ? ' past' : '');
 
     return (
       <div
@@ -31,12 +31,8 @@ class CalEvent extends React.Component {
                 zIndex: left}}
         onClick={this.onClick.bind(this)}
       >
-        <strong>
-          {utils.formatTime(start)}
-          {' - '}
-          {utils.formatTime(end)}
-        </strong>
-        <p>{title}</p>
+        <strong>{utils.formatTime(start)} - {utils.formatTime(end)}</strong>
+        <p>{summary}</p>
       </div>
     );
   }

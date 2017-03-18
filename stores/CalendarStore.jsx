@@ -1,16 +1,7 @@
 import {ReduceStore} from 'flux/utils';
 import Dispatcher from './dispatchers';
 import {CalendarActionTypes} from './ActionTypes';
-
-const findCalendar = (id, state) => {
-  let calendar = state.find((cal) => cal.id === id);
-
-  if (calendar == null) {
-    throw new ReferenceError(
-      `Cannot find calendar with id: ${id}`);
-  }
-  return calendar;
-}
+import {Map} from 'immutable';
 
 class CalendarStore extends ReduceStore {
 
@@ -19,36 +10,40 @@ class CalendarStore extends ReduceStore {
   }
 
   getInitialState() {
-    return [];
+    return Map({ primaryCal: null, calendars: Map() });
   }
 
   // TODO: hook up with google calendar
   reduce(state, action) {
     switch (action.type) {
       case CalendarActionTypes.CREATE_CALENDAR:
-        // TODO: Error check
-        return state.concat(action.details);
+        if (action.id == null) {
+          action.id = uuid();
+        }
+        return state.setIn(['calendars', action.id], action.details);
 
       case CalendarActionTypes.REMOVE_CALENDAR:
-        return state.filter((cal) => cal.id !== action.id);
+        return state.deleteIn(['calendars', action.id]);
 
-      case CalendarActionTypes.SET_NAME:
-        findCalendar(action.id, state).name = action.name;
-        return state.slice();
+      case CalendarActionTypes.SET_CAL_SUMMARY:
+        return state.setIn(['calendars', action.id, 'summary'], action.summary);
 
       case CalendarActionTypes.UPDATE_CALENDARS:
-        let ids = action.calendars.map(({id}) => id);
-        return state
-          .filter(({id}) => !ids.includes(id))
-          .concat(action.calendars);
+        return action.calendars.reduce(
+          (state, calendar) => state.updateIn(
+            ['calendars', calendar.id],
+            (existing) => (existing || Map()).merge(calendar)),
+          state);
 
       case CalendarActionTypes.TOGGLE_VISIBILITY:
-        let calendar = findCalendar(action.id, state);
-        calendar.visible = !calendar.visible;
-        return state.slice();
+        return state.updateIn(['calendars', action.id, 'visible'],
+                              (visible) => !visible);
 
       case CalendarActionTypes.WIPE_CALENDARS:
-        return [];
+        return this.getInitialState();
+
+      case CalendarActionTypes.SET_PRIMARY_CAL:
+        return state.set('primaryCal', action.id);
 
       default:
         return state;

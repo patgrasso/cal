@@ -1,10 +1,22 @@
 
+const ONE_DAY   = 86400000;
+const TZ_OFFSET = new Date().getTimezoneOffset() * 60000;
+
 module.exports.timeInHours = (date) => {
-  date = date || new Date();
+  date = new Date(date || Date.now());
   return date.getHours() + date.getMinutes() / 60;
 };
 
+module.exports.compareDates = (dateA, dateB) => {
+  dateA = new Date(dateA);
+  dateB = new Date(dateB);
+  return Math.floor((dateA - TZ_OFFSET) / ONE_DAY) -
+         Math.floor((dateB - TZ_OFFSET) / ONE_DAY);
+};
+
 module.exports.formatTime = (date) => {
+  date = new Date(date);
+
   let suffix = (date.getHours() < 12) ? 'a' : 'p';
   let minutes = date.getMinutes();
 
@@ -20,7 +32,7 @@ module.exports.formatTime = (date) => {
 
 module.exports.sameDayForWeek = (date, focusDate) => {
   let d = new Date(date);
-  focusDate = focusDate || new Date();
+  focusDate = new Date(focusDate || Date.now());
   d.setDate(focusDate.getDate() - focusDate.getDay() + d.getDay());
   d.setFullYear(focusDate.getFullYear());
   d.setMonth(focusDate.getMonth());

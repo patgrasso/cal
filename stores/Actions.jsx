@@ -1,5 +1,9 @@
-import {CalendarActionTypes, EventActionTypes} from './ActionTypes';
+import {CalendarActionTypes,
+        EventActionTypes,
+        ViewActionTypes} from './ActionTypes';
 import Dispatcher from './dispatchers';
+import uuid from 'uuid';
+import providers from './providers';
 
 export const CalendarActions = {
   update(calendars) {
@@ -13,10 +17,10 @@ export const CalendarActions = {
     Dispatcher.dispatch({
       type: CalendarActionTypes.CREATE_CALENDAR,
       details: {
-        name,
+        summary,
         color,
         accessRole: 'owner',
-        show: true
+        visible: true
       }
     });
   },
@@ -37,6 +41,10 @@ export const CalendarActions = {
 
   wipe() {
     Dispatcher.dispatch({ type: CalendarActionTypes.WIPE_CALENDARS })
+  },
+
+  setPrimary(id) {
+    Dispatcher.dispatch({ type: CalendarActionTypes.SET_PRIMARY_CAL, id });
   }
 };
 
@@ -52,15 +60,11 @@ export const EventActions = {
     EventActions.updateAll([event]);
   },
 
-  create(title, color='green') {
+  create(details) {
+    details.id = details.id || uuid();
     Dispatcher.dispatch({
       type: EventActionTypes.CREATE_EVENT,
-      details: {
-        name,
-        color,
-        accessRole: 'owner',
-        show: true
-      }
+      details: details
     });
   },
 
@@ -73,5 +77,15 @@ export const EventActions = {
 
   wipe() {
     Dispatcher.dispatch({ type: EventActionTypes.WIPE_EVENTS });
+  }
+};
+
+export const ViewActions = {
+  openEventModal(id) {
+    Dispatcher.dispatch({ type: ViewActionTypes.OPEN_EVENT_MODAL, id });
+  },
+
+  closeEventModal() {
+    Dispatcher.dispatch({ type: ViewActionTypes.CLOSE_EVENT_MODAL });
   }
 };

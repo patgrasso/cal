@@ -23,6 +23,7 @@ export const getCalendarList = () => {
         id: item.id,
         name: item.summary,
         visible: true,
+        primary: item.primary,
         accessRole: item.accessRole,
         color: item.backgroundColor
       }))),
@@ -57,7 +58,7 @@ export const getEvents = (calendarId, timeFrom, timeTo) => {
             return {
               calendarId,
               id: item.id,
-              title: item.summary,
+              summary: item.summary,
               start: startTime,
               allDay: item.start.dateTime == null,
               end: endTime,
@@ -70,4 +71,24 @@ export const getEvents = (calendarId, timeFrom, timeTo) => {
           resolve(strippedItems);
         }, (error) => reject(error));
   });
+};
+
+export const createEvent = (details) => {
+  return new Promise((resolve, reject) => {
+    gapi.client.calendar.events.insert({
+      calendarId : details.calendarId,
+      id         : details.id,
+      start      : { dateTime: start },
+      end        : { dateTime: end },
+      summary    : title,
+      location   : details.location
+    }).then((result) => {
+      console.log(result);
+      resolve(result);
+    }, (error) => reject(error));
+  });
+};
+
+export const syncEvents = (events) => {
+  return events;
 };

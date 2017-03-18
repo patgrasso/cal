@@ -6,7 +6,7 @@ import './CalendarList.styl';
 class CalendarList extends React.Component {
 
   render() {
-    let calendars = this.props.calendars.map((cal, i) => (
+    let calendars = this.props.calendars.toList().toJSON().map((cal, i) => (
       <CalendarCheckbox
         {...cal}
         onChanged={this.props.onToggleCalendar}

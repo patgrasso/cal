@@ -12,7 +12,7 @@ class SidebarContainer extends React.Component {
 
   static calculateState(prevState) {
     return {
-      calendars: CalendarStore.getState(),
+      calendars: CalendarStore.getState().get('calendars'),
       createCalendar: CalendarActions.create,
       removeCalendar: CalendarActions.remove,
       toggleCalendar: CalendarActions.toggle,

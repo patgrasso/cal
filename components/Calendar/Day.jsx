@@ -1,7 +1,9 @@
 import React from 'react';
 import CalEvent from './CalEvent';
-import { hourCellHeight } from './CalendarConstants';
 import utils from '../../utils';
+import uuid from 'uuid';
+import {EventActions, ViewActions} from '../../stores/Actions';
+import {hourCellHeight} from './CalendarConstants';
 
 const TIME_MARKER_UPDATE_MS = 60000;
 
@@ -29,21 +31,44 @@ class Day extends React.Component {
     }
   }
 
+  onClick(e) {
+    let {date, getMousePosition} = this.props;
+    let position = getMousePosition(e);
+
+    let startHour = Math.floor(position / hourCellHeight * 2) / 2;
+    let startDate = new Date(
+      date.getFullYear(), date.getMonth(), date.getDate(),
+      startHour, (startHour % 1) * 60);
+    let endDate = new Date(
+      date.getFullYear(), date.getMonth(), date.getDate(),
+      startHour + 1, ((startHour + 1) % 1) * 60);
+    let newId = uuid();
+
+    EventActions.create({
+      calendarId: this.props.primaryCal,
+      id: newId,
+      summary: '',
+      start: startDate,
+      end: endDate,
+      sync: ['local'],
+      location: ''
+    });
+    ViewActions.openEventModal(newId);
+  }
+
   render() {
     let {events, date} = this.props;
-    let clazz = 'calendar-day' + (!this.props.timeSinceToday ? ' today' : '');
-
-    let evs = utils.events.reconcile(events
-      .filter(({start}) => start.toDateString() === date.toDateString())
-      .filter(({allDay}) => !allDay));
+    let today = !utils.compareDates(date, new Date());
+    let clazz = 'calendar-day' + (today ? ' today' : '');
 
     let calEvents = utils.events.reconcile(events
-      .filter(({start}) => start.toDateString() === date.toDateString())
-      .filter(({allDay}) => !allDay))
+      .toList()
+      .filter((event) => !utils.compareDates(event.get('start'), date))
+      .filter((event) => !event.get('allDay')))
       .map(({event, left, size}, i) => (
 
         <CalEvent
-          {...event}
+          {...event.toJSON()}
           left={left}
           size={size}
           key={i}
@@ -53,14 +78,13 @@ class Day extends React.Component {
       ));
 
     return (
-      <div className={clazz}>
+      <div className={clazz} onClick={this.onClick.bind(this)} ref="self">
         {calEvents}
-        {this.props.timeSinceToday ? '' :
+        {today ?
           <div
             className="current-time-marker"
             style={{ top: hourCellHeight * this.state.time }}
-          ></div>
-        }
+          ></div> : null}
       </div>
     );
   }
