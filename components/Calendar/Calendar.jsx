@@ -4,6 +4,7 @@ import EventModal from './EventModal';
 import providers from '../../stores/providers';
 import CalendarHeader from './CalendarHeader';
 import EventActions from '../../stores/actions/EventActions';
+import time from '../../utils/time';
 import { Map } from 'immutable';
 
 class Calendar extends React.Component {
@@ -12,16 +13,14 @@ class Calendar extends React.Component {
     super(props);
     this.state = {
       viewType: ViewTypes.WEEK,
-      focusDate: new Date()
+      focusDate: new Date(),
+      dragging: null,
+      dragOffset: null
     };
   }
 
   componentDidMount() {
     providers.local.getEvents();
-  }
-
-  openModal(modalEventId) {
-    EventActions.startEditing(modalEventId);
   }
 
   dismissModal(event) {
@@ -30,24 +29,49 @@ class Calendar extends React.Component {
 
   moveForward() {
     let {focusDate, viewType} = this.state;
-    let d = new Date(focusDate);
+    let newFocusDate = new Date(+focusDate + time.days(viewType.delta));
+    let timeMax = new Date(+focusDate + 2*time.days(viewType.delta));
 
-    d.setDate(d.getDate() + viewType.delta);
-    this.setState({ focusDate: d });
-    providers.fetch(d, viewType.delta);
+    this.setState({ focusDate: newFocusDate });
+    providers.google.getEvents(focusDate.toISOString(), timeMax.toISOString());
   }
 
   moveBackward() {
-    let {focusDate, viewType} = this.state;
-    let d = new Date(focusDate);
+    let { focusDate, viewType } = this.state;
+    let newFocusDate = new Date(+focusDate - time.days(viewType.delta));
+    let timeMin = new Date(+focusDate - 2*time.days(viewType.delta));
 
-    d.setDate(d.getDate() - viewType.delta);
-    this.setState({ focusDate: d });
-    providers.fetch(d, viewType.delta);
+    this.setState({ focusDate: newFocusDate });
+    providers.google.getEvents(timeMin.toISOString(), focusDate.toISOString());
   }
 
   onChangeViewType(viewType) {
     this.setState({ viewType });
+  }
+
+  onDragStart(event, startDate) {
+    let start = new Date(event.get('start'));
+    this.setState({ dragging: event, dragOffset: startDate - start });
+  }
+
+  onDrop(newStartDate) {
+    if (!this.state.dragging) {
+      return;
+    }
+    let startDate = new Date(this.state.dragging.get('start'));
+    let eventLength = new Date(this.state.dragging.get('end')) - startDate;
+    let minutes = startDate.getMinutes();
+
+    newStartDate = new Date(newStartDate - this.state.dragOffset);
+    let roundMins = Math.round((newStartDate.getMinutes() - minutes) / 30) * 30;
+    newStartDate.setMinutes(minutes + roundMins);
+    let newEndDate = new Date(+newStartDate + eventLength);
+
+    EventActions.create(this.state.dragging
+                            .set('start', newStartDate)
+                            .set('end', newEndDate)
+                            .toJSON());
+    this.setState({ dragging: null });
   }
 
   render() {
@@ -69,6 +93,7 @@ class Calendar extends React.Component {
     return (
       <section className="calendar-container">
         <CalendarHeader
+          currentViewType={this.state.viewType}
           moveForward={this.moveForward.bind(this)}
           moveBackward={this.moveBackward.bind(this)}
           onChangeViewType={this.onChangeViewType.bind(this)}
@@ -78,7 +103,10 @@ class Calendar extends React.Component {
           calendars={this.props.calendars}
           primaryCal={this.props.primaryCal}
           focusDate={this.state.focusDate}
-          openModal={this.openModal.bind(this)}
+
+          onDragStart={this.onDragStart.bind(this)}
+          onDrop={this.onDrop.bind(this)}
+
           style={{'background-color': 'red'}}
         />
         {modalEvent ?

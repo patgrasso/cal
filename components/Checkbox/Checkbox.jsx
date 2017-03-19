@@ -1,8 +1,8 @@
 import React from 'react';
 
-import './CalendarCheckbox.styl';
+import './Checkbox.styl';
 
-class CalendarCheckbox extends React.Component {
+class Checkbox extends React.Component {
 
   onChanged(e) {
     this.props.onChanged(this.props.id);
@@ -11,9 +11,9 @@ class CalendarCheckbox extends React.Component {
   render() {
     let {color, name, visible} = this.props;
     return (
-      <li className="calendar-checkbox" onClick={this.onChanged.bind(this)}>
+      <li className="checkbox" onClick={this.onChanged.bind(this)}>
         <div
-          className="checkbox"
+          className="checkbox-input"
           style={{backgroundColor: visible ? color : '',
                   borderColor: visible ? color : ''}}
         />
@@ -24,4 +24,4 @@ class CalendarCheckbox extends React.Component {
 
 }
 
-export default CalendarCheckbox;
+export default Checkbox;

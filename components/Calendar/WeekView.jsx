@@ -61,7 +61,10 @@ class WeekView extends React.Component {
         date={getDateForDay(i, focusDate)}
         primaryCal={primaryCal}
         events={events}
-        openModal={this.props.openModal}
+
+        onDragStart={this.props.onDragStart}
+        onDrop={this.props.onDrop}
+
         getMousePosition={this.getMousePosition.bind(this)}
         key={i}
       />

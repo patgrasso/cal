@@ -30,12 +30,9 @@ class LocalStorageProvider extends Provider {
     return Promise.resolve(calendar.toJSON());
   }
 
-  getEvents(calendarId, timeMin, timeMax) {
+  getEvents(timeMin, timeMax) {
     let events = fromJS(JSON.parse(localStorage.getItem(EVENTS_KEY))).toList();
 
-    if (calendarId != null) {
-      events = events.filter((ev) => ev.get('calendarId') === calendarId);
-    }
     if (timeMin != null) {
       events = events.filter((ev) => new Date(ev.get('start')) >= timeMin);
     }

@@ -52,10 +52,8 @@ class GoogleAuth extends React.Component {
   }
 
   updateCalendar() {
-    GoogleProvider.getCalendarList().then((cals) => {
-      let primary = cals.find((cal) => cal.primary);
-      cals.forEach(({id}) => GoogleProvider.getEvents(id));
-    });
+    GoogleProvider.getCalendarList();
+    GoogleProvider.getEvents();
   }
 
   render() {

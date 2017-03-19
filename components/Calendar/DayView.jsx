@@ -52,6 +52,10 @@ class DayView extends React.Component {
           <Day
             date={focusDate}
             primaryCal={primaryCal}
+
+            onDragStart={this.props.onDragStart}
+            onDrop={this.props.onDrop}
+
             events={events}
             openModal={this.props.openModal}
             getMousePosition={this.getMousePosition.bind(this)}

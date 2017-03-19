@@ -37,13 +37,10 @@ class EventStore extends ReduceStore {
 
       case ProviderActionTypes.CREATE_EVENT:
         // create immutable
-        console.log(action);
         event = Map(fromJS([[ action.event.id, action.event ]]));
 
         // set 'synced' for provider
         event = event.setIn([action.event.id, 'synced', action.provider], true);
-
-        console.log(event.toJSON());
 
         return state.mergeIn([EVENTS], event);
 

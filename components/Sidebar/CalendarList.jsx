@@ -1,5 +1,5 @@
 import React from 'react';
-import CalendarCheckbox from './CalendarCheckbox';
+import Checkbox from '../Checkbox';
 
 import './CalendarList.styl';
 
@@ -7,7 +7,7 @@ class CalendarList extends React.Component {
 
   render() {
     let calendars = this.props.calendars.toList().toJSON().map((cal, i) => (
-      <CalendarCheckbox
+      <Checkbox
         {...cal}
         onChanged={this.props.toggleCalendar}
         key={i}

@@ -5,7 +5,7 @@ import uuid from 'uuid';
 import EventActions from '../../stores/actions/EventActions';
 import {hourCellHeight} from './CalendarConstants';
 
-const TIME_MARKER_UPDATE_MS = 60000;
+const TIME_MARKER_UPDATE_MS = 6000;
 
 import './Day.styl';
 
@@ -17,7 +17,7 @@ class Day extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.today) {
+    if (!utils.compareDates(this.props.date, new Date())) {
       this.timerID = setInterval(
         () => this.setState({ time: utils.timeInHours() }),
         TIME_MARKER_UPDATE_MS
@@ -26,13 +26,11 @@ class Day extends React.Component {
   }
 
   componentWillUnmount() {
-    if (this.props.today) {
-      clearInterval(this.timerID);
-    }
+    clearInterval(this.timerID);
   }
 
   onClick(e) {
-    let {date, getMousePosition} = this.props;
+    let { date, getMousePosition } = this.props;
     let position = getMousePosition(e);
 
     let startHour = Math.floor(position / hourCellHeight * 2) / 2;
@@ -56,6 +54,18 @@ class Day extends React.Component {
     EventActions.startEditing(newId);
   }
 
+  onDrop(e) {
+    let { date, getMousePosition } = this.props;
+    let position = getMousePosition(e);
+
+    let startHour = position / hourCellHeight;
+    let startDate = new Date(
+      date.getFullYear(), date.getMonth(), date.getDate(),
+      startHour, (startHour % 1) * 60);
+
+    this.props.onDrop(startDate);
+  }
+
   render() {
     let {events, date} = this.props;
     let today = !utils.compareDates(date, new Date());
@@ -68,17 +78,23 @@ class Day extends React.Component {
       .map(({event, left, size}, i) => (
 
         <CalEvent
-          {...event.toJSON()}
+          event={event}
           left={left}
           size={size}
           key={i}
-          onClick={this.props.openModal}
+          onDragStart={this.props.onDragStart}
+          getMousePosition={this.props.getMousePosition}
         />
 
       ));
 
     return (
-      <div className={clazz} onClick={this.onClick.bind(this)} ref="self">
+      <div
+        className={clazz}
+        onClick={this.onClick.bind(this)} ref="self"
+        onDrop={this.onDrop.bind(this)}
+        onDragOver={(e) => e.preventDefault()}
+      >
         {calEvents}
         {today ?
           <div

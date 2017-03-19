@@ -46,7 +46,7 @@ class Provider {
     throw new Error('Not implemented');
   }
 
-  getEvents(calendarId, timeMin, timeMax) {
+  getEvents(timeMin, timeMax) {
     throw new Error('Not implemented');
   }
 

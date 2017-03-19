@@ -8,7 +8,20 @@
   max-width: 90%
   z-index: 5
   overflow-y: hidden
-
+  user-select: none
+  cursor: default
 
   &.past
     opacity: 0.5
+
+  &:hover .resize-handle
+    background-color: black
+
+  .resize-handle
+    cursor: ns-resize
+    position: absolute
+    right: 0
+    left: 0
+    bottom: 0
+    height: 3px
+

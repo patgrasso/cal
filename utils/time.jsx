@@ -54,3 +54,7 @@ module.exports.endOfWeek = () => {
   d.setMinutes(0);
   return d.toISOString();
 };
+
+module.exports.days = (days) => {
+  return ONE_DAY * days;
+};

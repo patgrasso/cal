@@ -51,8 +51,10 @@ class EventModal extends React.Component {
   }
 
   onKeyPress(e) {
-    if (e.key === 'Enter') {
-      this.save();
+    switch (e.key) {
+      case 'Enter':
+        return this.save();
+
     }
   }
 
@@ -82,11 +84,10 @@ class EventModal extends React.Component {
     return (
       <div className="event-modal" onClick={this.cancel.bind(this)}>
         <div
-          tabIndex="0"
           className="event-modal-body"
           style={{backgroundColor: color}}
           onClick={this.onClick.bind(this)}
-          onKeyPress={this.onKeyPress.bind(this)}
+          onKeyDown={this.onKeyPress.bind(this)}
           ref="self"
         >
           <div className="event-detail">
@@ -131,7 +132,8 @@ class EventModal extends React.Component {
           </div>
           <div className="event-detail">
             <label>Synced:</label>
-            {synced.map((_, provider) => <p>{provider}</p>)}
+            {synced.map((_, provider, i) => <p key={i}>{provider}</p>)
+                   .toList().toJSON()}
           </div>
           <div className="event-action-container">
             <button

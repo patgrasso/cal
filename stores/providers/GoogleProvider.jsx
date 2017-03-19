@@ -1,6 +1,7 @@
 import Provider from './Provider';
 import ProviderActions from '../actions/ProviderActions';
 import time from '../../utils/time';
+import utils from '../../utils';
 import { Map } from 'immutable';
 
 const CALENDAR_LIST = 'calendarList';
@@ -10,6 +11,15 @@ class GoogleProvider extends Provider {
 
   constructor() {
     super(PROVIDER_NAME);
+    this._cachedCalendarList = null;
+  }
+
+  _getCachedCalendarList() {
+    if (this._cachedCalendarList) {
+      return Promise.resolve(this._cachedCalendarList);
+    }
+    return this.getCalendarList().then((list) =>
+      this._cachedCalendarList = list);
   }
 
   getCalendarList() {
@@ -36,8 +46,7 @@ class GoogleProvider extends Provider {
     throw new Error('Not implemented');
   }
 
-  // TODO: clean this up / rewrite
-  getEvents(calendarId, timeMin, timeMax) {
+  _getEventsForCalendar(calendarId, timeMin, timeMax) {
     return new Promise((resolve, reject) => {
       gapi.client.calendar.events
           .list({
@@ -73,10 +82,21 @@ class GoogleProvider extends Provider {
               };
             });
 
-            ProviderActions.updateEvents(PROVIDER_NAME, strippedItems);
             resolve(strippedItems);
           }, (error) => reject(error));
     });
+  }
+
+  // TODO: clean this up / rewrite
+  getEvents(timeMin, timeMax) {
+    return this._getCachedCalendarList()
+               .then((calendars) => Promise.all(calendars.map((cal) =>
+                 this._getEventsForCalendar(cal.id, timeMin, timeMax))))
+               .then((events) => {
+                 events = utils.join(events);
+                 ProviderActions.updateEvents(PROVIDER_NAME, events);
+                 return events;
+               });
   }
 
   createEvent(details) {

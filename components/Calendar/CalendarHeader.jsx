@@ -10,6 +10,7 @@ class CalendarHeader extends React.Component {
   }
 
   render() {
+    let { currentViewType: viewType } = this.props;
     return (
       <header className="calendar-header">
         <button
@@ -23,15 +24,15 @@ class CalendarHeader extends React.Component {
 
         <div className="view-type-list">
           <button
-            className="move-forward"
+            className={viewType === ViewTypes.DAY ? 'active' : ''}
             onClick={this.onChangeViewType.bind(this, ViewTypes.DAY)}
           >Day</button>
           <button
-            className="move-forward"
+            className={viewType === ViewTypes.WEEK ? 'active' : ''}
             onClick={this.onChangeViewType.bind(this, ViewTypes.WEEK)}
           >Week</button>
           <button
-            className="move-forward"
+            className={viewType === ViewTypes.MONTH ? 'active' : ''}
             onClick={this.onChangeViewType.bind(this, ViewTypes.MONTH)}
           >Month</button>
         </div>
