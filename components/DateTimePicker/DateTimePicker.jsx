@@ -1,5 +1,7 @@
 import React from 'react';
 
+import './DateTimePicker.styl';
+
 class DateTimePicker extends React.Component {
 
   onChangeTime(e) {

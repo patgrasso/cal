@@ -14,8 +14,12 @@
   &.past
     opacity: 0.5
 
-  &:hover .resize-handle
-    background-color: black
+  &:hover
+    .resize-handle
+      background-color: black
+
+    .synced.fa-check:not([hidden])
+      display: inline
 
   .resize-handle
     cursor: ns-resize
@@ -25,3 +29,13 @@
     bottom: 0
     height: 3px
 
+  .location
+    font-size: 10px
+
+  .synced
+    font-size: 8px
+    float: right
+    margin: 3px
+
+    &[hidden], &.fa-check
+      display: none

@@ -55,16 +55,40 @@ class LocalStorageProvider extends Provider {
     return Promise.resolve(event.toJSON());
   }
 
-  removeEvent(id) {
+  updateEvent(event) {
     let events = Map(fromJS(JSON.parse(localStorage.getItem(EVENTS_KEY))));
+    let oldEvent = events.get(event.id);
 
-    events = events.delete(id);
+    if (oldEvent == null) {
+      return Promise.reject({ error: `Event ${event.id} not found ` });
+    }
+
+    event = oldEvent.mergeDeep(fromJS(event));
+    events = events.set(event.get('id'), event);
     localStorage.setItem(EVENTS_KEY, JSON.stringify(events.toJSON()));
 
-    ProviderActions.removeEvent(PROVIDER_NAME, id);
-    return Promise.resolve(id);
+    ProviderActions.createEvent(PROVIDER_NAME, event.toJSON());
+    return Promise.resolve(event.toJSON());
   }
 
+  removeEvent(event) {
+    console.log(event);
+    let events = Map(fromJS(JSON.parse(localStorage.getItem(EVENTS_KEY))));
+
+    events = events.delete(event.id);
+    localStorage.setItem(EVENTS_KEY, JSON.stringify(events.toJSON()));
+
+    ProviderActions.removeEvent(PROVIDER_NAME, event);
+    return Promise.resolve(event);
+  }
+
+}
+
+if (localStorage.getItem(EVENTS_KEY) == null) {
+  localStorage.setItem(EVENTS_KEY, '{}');
+}
+if (localStorage.getItem(CALENDARS_KEY) == null) {
+  localStorage.setItem(CALENDARS_KEY, '{}');
 }
 
 export default new LocalStorageProvider();

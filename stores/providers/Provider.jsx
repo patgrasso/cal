@@ -1,5 +1,5 @@
-import EventStore from '../EventStore2';
-import CalendarStore from '../CalendarStore2';
+import EventStore from '../EventStore';
+import CalendarStore from '../CalendarStore';
 import Dispatcher from '../actions/Dispatcher';
 import EventActionTypes from '../actions/EventActionTypes';
 import CalendarActionTypes from '../actions/CalendarActionTypes';
@@ -27,11 +27,13 @@ class Provider {
             return this.createCalendar(action.calendar);
 
           case EventActionTypes.UPDATE_EVENT:
+            return this.updateEvent(action.event);
+
           case EventActionTypes.CREATE_EVENT:
             return this.createEvent(action.event);
 
           case EventActionTypes.REMOVE_EVENT:
-            return this.removeEvent(action.id);
+            return this.removeEvent(action.event);
         }
       }, 0);
 
@@ -50,7 +52,11 @@ class Provider {
     throw new Error('Not implemented');
   }
 
-  createEvent(details) {
+  createEvent(event) {
+    throw new Error('Not implemented');
+  }
+
+  updateEvent() {
     throw new Error('Not implemented');
   }
 

@@ -4,14 +4,14 @@ import './Checkbox.styl';
 
 class Checkbox extends React.Component {
 
-  onChanged(e) {
-    this.props.onChanged(this.props.id);
+  onChange(e) {
+    this.props.onChange(this.props.id || this.props.name, !this.props.visible);
   }
 
   render() {
     let {color, name, visible} = this.props;
     return (
-      <li className="checkbox" onClick={this.onChanged.bind(this)}>
+      <li className="checkbox" onClick={this.onChange.bind(this)}>
         <div
           className="checkbox-input"
           style={{backgroundColor: visible ? color : '',

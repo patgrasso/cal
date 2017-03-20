@@ -34,11 +34,11 @@ const ProviderActions = {
     });
   },
 
-  removeEvent(provider, id) {
+  removeEvent(provider, event) {
     Dispatcher.dispatch({
       type: ProviderActionTypes.REMOVE_EVENT,
       provider,
-      id
+      event
     });
   }
 };

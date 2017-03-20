@@ -5,6 +5,8 @@ import providers from '../../stores/providers';
 import CalendarHeader from './CalendarHeader';
 import EventActions from '../../stores/actions/EventActions';
 import time from '../../utils/time';
+import utils from '../../utils';
+import moment from 'moment-timezone';
 import { Map } from 'immutable';
 
 class Calendar extends React.Component {
@@ -24,6 +26,10 @@ class Calendar extends React.Component {
   }
 
   dismissModal(event) {
+    if (event && event.originalEvent) {
+      event.id = event.originalEvent;
+      delete event.originalEvent;
+    }
     EventActions.finishEditing(event);
   }
 
@@ -54,12 +60,15 @@ class Calendar extends React.Component {
     this.setState({ dragging: event, dragOffset: startDate - start });
   }
 
+  // TODO: convert to moment()
   onDrop(newStartDate) {
-    if (!this.state.dragging) {
+    let event = this.state.dragging;
+    if (!event) {
       return;
     }
-    let startDate = new Date(this.state.dragging.get('start'));
-    let eventLength = new Date(this.state.dragging.get('end')) - startDate;
+    let startDate = new Date(event.get('start'));
+    let endDate = new Date(event.get('end'));
+    let eventLength = endDate - startDate;
     let minutes = startDate.getMinutes();
 
     newStartDate = new Date(newStartDate - this.state.dragOffset);
@@ -67,10 +76,18 @@ class Calendar extends React.Component {
     newStartDate.setMinutes(minutes + roundMins);
     let newEndDate = new Date(+newStartDate + eventLength);
 
-    EventActions.create(this.state.dragging
-                            .set('start', newStartDate)
-                            .set('end', newEndDate)
-                            .toJSON());
+    let originalEvent = this.props.events.get(event.get('originalEvent'));
+    if (originalEvent != null) {
+      newStartDate = moment(originalEvent.get('start')).add(
+        newStartDate - startDate);
+      newEndDate = moment(originalEvent.get('end')).add(
+        newEndDate - endDate);
+      event = originalEvent;
+    }
+
+    EventActions.update(event.set('start', newStartDate)
+                             .set('end', newEndDate)
+                             .toJSON());
     this.setState({ dragging: null });
   }
 
@@ -86,6 +103,9 @@ class Calendar extends React.Component {
       .filter((event) => visibleCals.has(event.get('calendarId')))
       .map((event) => event.set(
         'color', visibleCals.getIn([event.get('calendarId'), 'color'])));
+
+    // Create fake instance for recurring events
+    events = utils.events.createPseudoEvents(events);
 
     // Construct the event modal if need be
     let modalEvent = events.get(this.props.currentlyEditing);
@@ -103,6 +123,7 @@ class Calendar extends React.Component {
           calendars={this.props.calendars}
           primaryCal={this.props.primaryCal}
           focusDate={this.state.focusDate}
+          timeFinderHours={this.props.timeFinderHours}
 
           onDragStart={this.onDragStart.bind(this)}
           onDrop={this.onDrop.bind(this)}

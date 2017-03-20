@@ -1,7 +1,13 @@
-import {ReduceStore} from 'flux/utils';
-import Dispatcher from './dispatchers';
-import {CalendarActionTypes} from './ActionTypes';
-import {Map} from 'immutable';
+import ProviderActionTypes from './actions/ProviderActionTypes';
+import CalendarActionTypes from './actions/CalendarActionTypes';
+import Dispatcher from './actions/Dispatcher';
+import providers from './providers';
+
+import { Map, fromJS } from 'immutable';
+import { ReduceStore } from 'flux/utils';
+
+const CALENDAR_LIST = 'calendarList';
+const PRIMARY_CAL   = 'primaryCal';
 
 class CalendarStore extends ReduceStore {
 
@@ -10,40 +16,55 @@ class CalendarStore extends ReduceStore {
   }
 
   getInitialState() {
-    return Map({ primaryCal: null, calendars: Map() });
+    return Map({ primaryCal: null, calendarList: Map() });
   }
 
-  // TODO: hook up with google calendar
   reduce(state, action) {
+    let cal;
     switch (action.type) {
+
+      // provider actions
+      case ProviderActionTypes.UPDATE_CALENDAR_LIST:
+        // create immutable
+        let calendarList = Map(fromJS(action.calendarList.map((cal) =>
+          [cal.id, cal])));
+
+        // find calendar with 'primary' == true, if any
+        let primaryCal = calendarList.find((cal) => cal.get('primary'));
+
+        // set 'synced' for provider
+        calendarList = calendarList.map((cal) =>
+          cal.setIn(['synced', action.provider], true));
+
+        return state.mergeIn([CALENDAR_LIST], calendarList)
+                    .set(PRIMARY_CAL, primaryCal && primaryCal.get('id'));
+        return state;
+
+      case ProviderActionTypes.CREATE_CALENDAR:
+        // create immutable
+        cal = Map(fromJS([ action.calendar.id, action.calendar ]));
+
+        // set 'synced' for provider
+        cal = cal.setIn([action.calendar.id, 'synced', action.provider], true);
+
+        return state.mergeIn([CALENDAR_LIST], cal);
+
+
+      // user actions
       case CalendarActionTypes.CREATE_CALENDAR:
-        if (action.id == null) {
-          action.id = uuid();
-        }
-        return state.setIn(['calendars', action.id], action.details);
+        // create immutable
+        cal = Map(fromJS([action.calendar.id, action.calendar]));
 
-      case CalendarActionTypes.REMOVE_CALENDAR:
-        return state.deleteIn(['calendars', action.id]);
+        // for each provider in 'synced', create the calendar
+        // and set the value for that provider to false (not synced yet)
+        cal = cal.update('synced', (synced) => synced.map(() => false));
 
-      case CalendarActionTypes.SET_CAL_SUMMARY:
-        return state.setIn(['calendars', action.id, 'summary'], action.summary);
-
-      case CalendarActionTypes.UPDATE_CALENDARS:
-        return action.calendars.reduce(
-          (state, calendar) => state.updateIn(
-            ['calendars', calendar.id],
-            (existing) => (existing || Map()).merge(calendar)),
-          state);
+        return state.mergeIn([CALENDAR_LIST], calendar);
 
       case CalendarActionTypes.TOGGLE_VISIBILITY:
-        return state.updateIn(['calendars', action.id, 'visible'],
-                              (visible) => !visible);
+        let visible = state.getIn([CALENDAR_LIST, action.id, 'visible']);
+        return state.setIn([CALENDAR_LIST, action.id, 'visible'], !visible);
 
-      case CalendarActionTypes.WIPE_CALENDARS:
-        return this.getInitialState();
-
-      case CalendarActionTypes.SET_PRIMARY_CAL:
-        return state.set('primaryCal', action.id);
 
       default:
         return state;

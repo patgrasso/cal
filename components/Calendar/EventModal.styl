@@ -15,6 +15,7 @@
   transform: translate(-50%, -50%)
   width: 50%
   height: 50%
+  min-height: 300px
   z-index: 100
   padding: 20px
   outline: none
@@ -22,32 +23,34 @@
   background-color: default
   border: 1px solid rgba(0, 0, 0, 0.2)
   border-radius: 3px
-  font-family: 'Roboto Mono'
+  font-family: 'sans-serif'
 
-  input
-    font-family: 'Roboto Mono'
+  input, textarea
+    font-family: 'sans-serif'
     background-color: transparent
     border: none
     border-bottom: 2px solid rgba(0, 0, 0, 0.2)
     outline: none
+    resize: none
 
   .event-title
     margin-bottom: 10px
     font-size: 20px
 
   .event-detail
-    font-size: 16px
+    font-size: 14px
     margin-bottom: 10px
     display: table
     width: 100%
 
     label
       display: table-cell
+      vertical-align: top
       width: 120px
 
-    input
+    input, textarea
       display: table-cell
-      font-size: 16px
+      font-size: 14px
       width: 100%
 
   .event-action-container

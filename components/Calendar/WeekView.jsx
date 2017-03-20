@@ -49,18 +49,12 @@ class WeekView extends React.Component {
       );
     });
 
-    // Make recurring events appear this week
-    events = events.map(
-      (event) => event.get('recurrence') === 'WEEKLY'
-             ? event.update('start', (s) => utils.sameDayForWeek(s, focusDate))
-                    .update('end', (e) => utils.sameDayForWeek(e, focusDate))
-             : event);
-
     let dayColumns = utils.range(7).map((i) => (
       <Day
         date={getDateForDay(i, focusDate)}
         primaryCal={primaryCal}
         events={events}
+        timeFinderHours={this.props.timeFinderHours}
 
         onDragStart={this.props.onDragStart}
         onDrop={this.props.onDrop}

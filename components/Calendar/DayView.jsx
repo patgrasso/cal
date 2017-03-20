@@ -33,13 +33,6 @@ class DayView extends React.Component {
     let name = dayNames[focusDate.getDay()];
     let {events} = this.props;
 
-    // Make recurring events appear this week
-    events = events.map(
-      (event) => event.get('recurrence') === 'WEEKLY'
-             ? event.update('start', (s) => utils.sameDayForWeek(s, focusDate))
-                    .update('end', (e) => utils.sameDayForWeek(e, focusDate))
-             : event);
-
     return (
       <div className="calendar-dayview">
         <header>

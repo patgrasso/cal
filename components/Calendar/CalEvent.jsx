@@ -51,7 +51,7 @@ class CalEvent extends React.Component {
     let minutes = tempEnd.getMinutes();
 
     tempEnd.setMinutes(Math.round(minutes / 30) * 30);
-    EventActions.create(
+    EventActions.update(
       this.props.event
           .set('end', tempEnd)
           .toJSON());
@@ -59,16 +59,17 @@ class CalEvent extends React.Component {
   }
 
   render() {
-    let { start, end, summary, color } = this.props.event.toJSON();
+    let { start, end, summary, color, location } = this.props.event.toJSON();
     let { left, size } = this.props;
     let timeStart = utils.timeInHours(start);
     let timeEnd = utils.timeInHours(this.state.temporaryEnd || end);
     let pxFromTop = timeStart * hourCellHeight - 1;
     let pxHeight = (timeEnd - timeStart) * hourCellHeight - 4;
-
     let clazz = 'calendar-event' + (new Date(end) < Date.now() ? ' past' : '');
+    let allSyncedUp = this.props.event.get('synced').every((synced) => synced);
 
     end = this.state.temporaryEnd || end;
+    pxHeight = Math.max(hourCellHeight / 2 - 4, pxHeight);
 
     return (
       <div
@@ -85,7 +86,10 @@ class CalEvent extends React.Component {
         onDragStart={this.onDragStart.bind(this)}
       >
         <strong>{utils.formatTime(start)} - {utils.formatTime(end)}</strong>
-        <p>{summary}</p>
+        <i className="synced fa fa-check" hidden={allSyncedUp ? false : true}></i>
+        <i className="synced fa fa-refresh" hidden={allSyncedUp ? true : false}></i>
+        <p className="summary">{summary}</p>
+        <p className="location">{location}</p>
         <div
           draggable="true"
           className="resize-handle"

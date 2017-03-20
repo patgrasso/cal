@@ -1,6 +1,6 @@
 import React from 'react';
 import CalendarActions from '../stores/actions/CalendarActions';
-import CalendarStore from '../stores/CalendarStore2';
+import CalendarStore from '../stores/CalendarStore';
 import Sidebar from '../components/Sidebar/Sidebar';
 
 import { Container } from 'flux/utils';

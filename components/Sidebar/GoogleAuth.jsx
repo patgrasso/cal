@@ -6,7 +6,7 @@ import CalendarActions from '../../stores/actions/CalendarActions';
 import GoogleProvider from '../../stores/providers/GoogleProvider';
 
 const googleConfig = require('../../client_id.json');
-const scopes = 'https://www.googleapis.com/auth/calendar.readonly';
+const scopes = 'https://www.googleapis.com/auth/calendar';
 const discoveryDocs = [
   'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'
 ];
@@ -44,8 +44,7 @@ class GoogleAuth extends React.Component {
   updateSigninStatus(isSignedIn) {
     this.setState({ isSignedIn });
     if (!isSignedIn) {
-      EventActions.wipe();
-      CalendarActions.wipe();
+      console.error('Should wipe out calendars: GoogleAuth.jsx: 47');
     } else {
       this.updateCalendar();
     }

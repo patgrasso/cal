@@ -1,11 +1,10 @@
 import React from 'react';
 import CalEvent from './CalEvent';
 import utils from '../../utils';
-import uuid from 'uuid';
 import EventActions from '../../stores/actions/EventActions';
 import {hourCellHeight} from './CalendarConstants';
 
-const TIME_MARKER_UPDATE_MS = 6000;
+const TIME_MARKER_UPDATE_MS = 60000;
 
 import './Day.styl';
 
@@ -17,12 +16,14 @@ class Day extends React.Component {
   }
 
   componentDidMount() {
-    if (!utils.compareDates(this.props.date, new Date())) {
-      this.timerID = setInterval(
-        () => this.setState({ time: utils.timeInHours() }),
-        TIME_MARKER_UPDATE_MS
-      );
-    }
+    this.timerID = setInterval(
+      () => {
+        if (!utils.compareDates(this.props.date, new Date())) {
+          this.setState({ time: utils.timeInHours() })
+        }
+      },
+      TIME_MARKER_UPDATE_MS
+    );
   }
 
   componentWillUnmount() {
@@ -40,7 +41,7 @@ class Day extends React.Component {
     let endDate = new Date(
       date.getFullYear(), date.getMonth(), date.getDate(),
       startHour + 1, ((startHour + 1) % 1) * 60);
-    let newId = uuid();
+    let newId = utils.uuid();
 
     EventActions.create({
       calendarId: this.props.primaryCal,
@@ -48,7 +49,7 @@ class Day extends React.Component {
       summary: '',
       start: startDate,
       end: endDate,
-      synced: { local: false },
+      synced: { google: false },
       location: ''
     });
     EventActions.startEditing(newId);
@@ -67,7 +68,7 @@ class Day extends React.Component {
   }
 
   render() {
-    let {events, date} = this.props;
+    let {events, date, findTimeHours} = this.props;
     let today = !utils.compareDates(date, new Date());
     let clazz = 'calendar-day' + (today ? ' today' : '');
 
@@ -87,6 +88,11 @@ class Day extends React.Component {
         />
 
       ));
+
+    let potentialEvents = utils.events.findTime(events, findTimeHours);
+
+    console.log(potentialEvents);
+
 
     return (
       <div
