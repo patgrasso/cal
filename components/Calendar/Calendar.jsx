@@ -1,6 +1,7 @@
 import React from 'react';
 import ViewTypes from './CalendarViewTypes';
 import EventModal from './EventModal';
+import TimeFinderModal from './TimeFinderModal';
 import providers from '../../stores/providers';
 import CalendarHeader from './CalendarHeader';
 import EventActions from '../../stores/actions/EventActions';
@@ -109,6 +110,18 @@ class Calendar extends React.Component {
 
     // Construct the event modal if need be
     let modalEvent = events.get(this.props.currentlyEditing);
+    let eventModal = modalEvent
+                   ? <EventModal
+                       event={modalEvent}
+                       calendars={this.props.calendars}
+                       dismiss={this.dismissModal.bind(this)} />
+                   : null;
+    let timeFinderModal = this.props.timeFinder.get('isOpen')
+                        ? <TimeFinderModal {...this.props.timeFinder.toJSON()} />
+                        : null;
+
+    // Modal order of importance
+    let modal =  timeFinderModal || eventModal;
 
     return (
       <section className="calendar-container">
@@ -117,25 +130,21 @@ class Calendar extends React.Component {
           moveForward={this.moveForward.bind(this)}
           moveBackward={this.moveBackward.bind(this)}
           onChangeViewType={this.onChangeViewType.bind(this)}
+          timeFinder={this.props.timeFinder}
         />
         <View
           events={events}
           calendars={this.props.calendars}
           primaryCal={this.props.primaryCal}
           focusDate={this.state.focusDate}
-          timeFinderHours={this.props.timeFinderHours}
+          timeFinder={this.props.timeFinder}
 
           onDragStart={this.onDragStart.bind(this)}
           onDrop={this.onDrop.bind(this)}
 
           style={{'background-color': 'red'}}
         />
-        {modalEvent ?
-         <EventModal
-           event={modalEvent}
-           calendars={this.props.calendars}
-           dismiss={this.dismissModal.bind(this)}
-         /> : null}
+        { modal ? modal : '' }
       </section>
     );
   }

@@ -1,7 +1,10 @@
 
 @import "../_constants"
 
-.event-modal
+.time-finder-modal
+  button
+    color: #000
+
   input, textarea
     background-color: transparent
     border: none
@@ -9,11 +12,7 @@
     outline: none
     resize: none
 
-  .event-title
-    margin-bottom: 10px
-    font-size: 20px
-
-  .event-detail
+  .tf-detail
     font-size: 14px
     margin-bottom: 10px
     display: table
@@ -23,13 +22,13 @@
       font-weight: 700
       display: table-cell
       vertical-align: top
-      width: 100px
+      width: 60px
 
     input, textarea
       display: table-cell
       font-size: 14px
       width: 100%
 
-  .Select-menu-outer
-    overflow: hidden
-
+    .time-input
+      width: 20px
+      text-align: center

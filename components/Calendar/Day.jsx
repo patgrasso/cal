@@ -1,8 +1,10 @@
 import React from 'react';
 import CalEvent from './CalEvent';
+import TimeBlock from './TimeBlock';
 import utils from '../../utils';
 import EventActions from '../../stores/actions/EventActions';
-import {hourCellHeight} from './CalendarConstants';
+import moment from 'moment-timezone';
+import { hourCellHeight } from './CalendarConstants';
 
 const TIME_MARKER_UPDATE_MS = 60000;
 
@@ -68,14 +70,17 @@ class Day extends React.Component {
   }
 
   render() {
-    let {events, date, findTimeHours} = this.props;
+    let { events, date, timeFinder } = this.props;
     let today = !utils.compareDates(date, new Date());
     let clazz = 'calendar-day' + (today ? ' today' : '');
 
-    let calEvents = utils.events.reconcile(events
+    let eventsForToday = events
       .toList()
       .filter((event) => !utils.compareDates(event.get('start'), date))
-      .filter((event) => !event.get('allDay')))
+      .filter((event) => !event.get('allDay'));
+
+    let calEvents = utils.events
+      .reconcile(eventsForToday)
       .map(({event, left, size}, i) => (
 
         <CalEvent
@@ -84,15 +89,27 @@ class Day extends React.Component {
           size={size}
           key={i}
           onDragStart={this.props.onDragStart}
-          getMousePosition={this.props.getMousePosition}
-        />
+          getMousePosition={this.props.getMousePosition} />
 
       ));
 
-    let potentialEvents = utils.events.findTime(events, findTimeHours);
+    let potentialEvents = [];
 
-    console.log(potentialEvents);
+    if (this.props.timeFinder.get('isSearching')) {
+      potentialEvents = utils.events.findTime(
+        eventsForToday, timeFinder.get('hours'),
+        timeFinder.get('timeMin'), timeFinder.get('timeMax')
+      ).toJSON().map((time, i) => (
 
+        <TimeBlock
+          start={time}
+          end={moment(time).add(timeFinder.get('hours'), 'hours')}
+          summary={timeFinder.get('summary')}
+          primaryCal={this.props.primaryCal}
+          key={i} />
+
+      ));
+    }
 
     return (
       <div
@@ -102,6 +119,7 @@ class Day extends React.Component {
         onDragOver={(e) => e.preventDefault()}
       >
         {calEvents}
+        {potentialEvents}
         {today ?
           <div
             className="current-time-marker"

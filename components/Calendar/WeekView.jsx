@@ -54,7 +54,7 @@ class WeekView extends React.Component {
         date={getDateForDay(i, focusDate)}
         primaryCal={primaryCal}
         events={events}
-        timeFinderHours={this.props.timeFinderHours}
+        timeFinder={this.props.timeFinder}
 
         onDragStart={this.props.onDragStart}
         onDrop={this.props.onDrop}

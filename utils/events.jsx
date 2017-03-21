@@ -106,22 +106,48 @@ function createPseudoEvents(events) {
 }
 
 
-function findTime(events, hours) {
-  let startTimes = [];
+function findTime(events, hours, timeMin, timeMax) {
+  let startTimes = []
+    , i, start, end, withinHours, afterTimeMin, beforeTimeMax;
 
-  if (hours == null) {
+  if (hours == null || events.size <= 0) {
     return List();
   }
 
-  hours = moment.duration(hours, 'hours');
+  timeMin = (timeMin == null) ? null : moment(timeMin);
+  timeMax = (timeMax == null) ? null : moment(timeMax);
+  hours = moment.duration({
+    hours: Math.floor(hours),
+    minutes: (hours % 1) * 60
+  });
+  events = events.sort((a, b) =>
+    moment(a.get('start')) > moment(b.get('start'))
+  ).map((ev) => ev.update('start', (s) => moment(s))
+                  .update('end', (e) => moment(e)));
 
-  events.forEach((event, key) => {
-    let start = moment(event.get('start'));
+  let midnight = moment(events.get(0).get('start'))
+    .hours(0).minutes(0).seconds(0).milliseconds(0);
 
-    if (!events.delete(key).some((ev) => ev.get('start') - start < hours)) {
+  // How about before the first event?
+  end = events.getIn([0, 'start'])
+  start = moment(end - hours);
+  if (end - midnight > hours && (timeMin == null || start > timeMin)) {
+    startTimes.push(moment(events.getIn([0, 'start']) - hours).toISOString());
+  }
+
+  // Check each pair of adjacent events to see if there's space between them
+  for (i = 1; i < events.size; i += 1) {
+    end = events.getIn([i, 'start']);
+    start = events.slice(0, i).maxBy((e) => e.get('end')).get('end');
+
+    withinHours = end - start > hours - (1/60);
+    afterTimeMin = (timeMin == null) || (start >= timeMin);
+    beforeTimeMax = (timeMax == null) || (start < timeMax);
+
+    if (withinHours && afterTimeMin && beforeTimeMax) {
       startTimes.push(start.toISOString());
     }
-  });
+  }
 
   return List(startTimes);
 }

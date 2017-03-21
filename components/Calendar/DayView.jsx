@@ -45,12 +45,12 @@ class DayView extends React.Component {
           <Day
             date={focusDate}
             primaryCal={primaryCal}
+            events={events}
+            timeFinder={this.props.timeFinder}
 
             onDragStart={this.props.onDragStart}
             onDrop={this.props.onDrop}
 
-            events={events}
-            openModal={this.props.openModal}
             getMousePosition={this.getMousePosition.bind(this)}
           />
         </div>

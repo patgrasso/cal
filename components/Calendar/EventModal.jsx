@@ -4,6 +4,7 @@ import Select from 'react-select';
 import DateTimePicker from '../DateTimePicker';
 import Checkbox from '../Checkbox';
 import providers from '../../stores/providers';
+import Modal from '../Modal';
 import { fromJS } from 'immutable';
 
 import EventActions from '../../stores/actions/EventActions';
@@ -20,10 +21,6 @@ class EventModal extends React.Component {
 
   componentDidMount() {
     this.refs.eventTitle.focus();
-  }
-
-  onClick(e) {
-    e.stopPropagation();
   }
 
   onEventSummaryChange({target}) {
@@ -62,13 +59,6 @@ class EventModal extends React.Component {
     }
   }
 
-  onKeyPress(e) {
-    switch (e.key) {
-      case 'Enter':
-        return this.save();
-    }
-  }
-
   save() {
     let {event} = this.state;
     this.props.dismiss(event.update('synced', (synced) =>
@@ -99,95 +89,90 @@ class EventModal extends React.Component {
     synced = unsynced.merge(synced);
 
     return (
-      <div className="event-modal" onClick={this.cancel.bind(this)}>
-        <div
-          className="event-modal-body"
-          style={{backgroundColor: color}}
-          onClick={this.onClick.bind(this)}
-          onKeyDown={this.onKeyPress.bind(this)}
-          ref="self"
-        >
-          <div className="event-detail">
-            <input
-              type="text"
-              className="event-title"
-              onChange={this.onEventSummaryChange.bind(this)}
-              onKeyPress={this.onKeyPress.bind(this)}
-              ref="eventTitle"
-              value={summary}
-            />
-          </div>
-
-          <div className="event-detail">
-            <label>Start:</label>
-            <DateTimePicker
-              date={new Date(start)}
-              onChange={this.onEventStartChange.bind(this)} />
-          </div>
-
-          <div className="event-detail">
-            <label>End:</label>
-            <DateTimePicker
-              date={new Date(end)}
-              onChange={this.onEventEndChange.bind(this)} />
-          </div>
-
-          <div className="event-detail">
-            <label>Location:</label>
-            <input
-              type="text"
-              className="event-location"
-              onChange={this.onEventLocationChange.bind(this)}
-              onKeyPress={this.onKeyPress.bind(this)}
-              value={location}
-            />
-          </div>
-
-          <div className="event-detail">
-            <label>Calendar:</label>
-            <Select
-              value={event.get('calendarId')}
-              options={calendarOptions}
-              onChange={this.onEventCalendarChange.bind(this)}
-            />
-          </div>
-
-          <div className="event-detail">
-            <label>Synced:</label>
-            <ul>
-              {synced.map((visible, provider) => (
-                <Checkbox
-                  key={provider}
-                  color="#2196f3"
-                  name={provider}
-                  onChange={this.onEventSyncedChanged.bind(this)}
-                  visible={visible}
-                />
-               )).toList().toJSON()}
-            </ul>
-          </div>
-
-          <div className="event-detail">
-            <label>Description:</label>
-            <textarea rows="3" onKeyDown={(e) => e.stopPropagation()}></textarea>
-          </div>
-
-          <div className="event-action-container">
-            <button
-              className="event-action save"
-              onClick={this.save.bind(this)}
-            >Save</button>
-            <button
-              className="event-action cancel"
-              onClick={this.cancel.bind(this)}
-            >Cancel</button>
-            <button
-              className="event-action cancel"
-              onClick={this.remove.bind(this)}
-            >Delete</button>
-          </div>
+      <Modal
+        color={color}
+        className="event-modal"
+        onConfirm={this.save.bind(this)}
+        onCancel={this.cancel.bind(this)}
+      >
+        <div className="event-detail">
+          <input
+            type="text"
+            className="event-title"
+            onChange={this.onEventSummaryChange.bind(this)}
+            ref="eventTitle"
+            value={summary}
+          />
         </div>
-      </div>
+
+        <div className="event-detail">
+          <label>Start</label>
+          <DateTimePicker
+            date={new Date(start)}
+            onChange={this.onEventStartChange.bind(this)} />
+        </div>
+
+        <div className="event-detail">
+          <label>End</label>
+          <DateTimePicker
+            date={new Date(end)}
+            onChange={this.onEventEndChange.bind(this)} />
+        </div>
+
+        <div className="event-detail">
+          <label>Location</label>
+          <input
+            type="text"
+            className="event-location"
+            onChange={this.onEventLocationChange.bind(this)}
+            value={location}
+          />
+        </div>
+
+        <div className="event-detail">
+          <label>Calendar</label>
+          <Select
+            value={event.get('calendarId')}
+            options={calendarOptions}
+            onChange={this.onEventCalendarChange.bind(this)}
+          />
+        </div>
+
+        <div className="event-detail">
+          <label>Synced</label>
+          <ul>
+            {synced.map((visible, provider) => (
+              <Checkbox
+                key={provider}
+                color="#2196f3"
+                name={provider}
+                onChange={this.onEventSyncedChanged.bind(this)}
+                visible={visible}
+              />
+              )).toList().toJSON()}
+          </ul>
+        </div>
+
+        <div className="event-detail">
+          <label>Description:</label>
+          <textarea rows="3" onKeyDown={(e) => e.stopPropagation()}></textarea>
+        </div>
+
+        <div className="modal-actions">
+          <button
+            className="modal-action save"
+            onClick={this.save.bind(this)}
+          >Save</button>
+          <button
+            className="modal-action cancel"
+            onClick={this.cancel.bind(this)}
+          >Cancel</button>
+          <button
+            className="modal-action cancel"
+            onClick={this.remove.bind(this)}
+          >Delete</button>
+        </div>
+      </Modal>
     );
   }
 

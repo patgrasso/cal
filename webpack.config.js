@@ -1,7 +1,7 @@
 const webpack = require('webpack');
 const path = require('path');
 
-const BUILD_DIR = path.resolve(__dirname, 'public');
+const BUILD_DIR = path.resolve(__dirname, 'public', 'assets');
 const VIEWS_DIR = path.resolve(__dirname, 'containers');
 const COMPONENTS_DIR = path.resolve(__dirname, 'components');
 
