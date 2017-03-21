@@ -40,6 +40,8 @@ class TimeBlock extends React.Component {
         className="time-block"
         style={{top: pxFromTop,
                 height: pxHeight}}
+        onMouseDown={(e) => e.stopPropagation()}
+        onMouseUp={(e) => e.stopPropagation()}
         onClick={this.onClick.bind(this)}
       >
         <strong>{utils.formatTime(start)} - {utils.formatTime(end)}</strong>

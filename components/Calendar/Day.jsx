@@ -4,6 +4,7 @@ import TimeBlock from './TimeBlock';
 import utils from '../../utils';
 import EventActions from '../../stores/actions/EventActions';
 import moment from 'moment-timezone';
+import { Map } from 'immutable';
 import { hourCellHeight } from './CalendarConstants';
 
 const TIME_MARKER_UPDATE_MS = 60000;
@@ -14,13 +15,17 @@ class Day extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { time: utils.timeInHours() };
+    this.state = {
+      time: utils.timeInHours(),
+      mouseDownStart: null,
+      mouseDownCurr: null
+    };
   }
 
   componentDidMount() {
     this.timerID = setInterval(
       () => {
-        if (!utils.compareDates(this.props.date, new Date())) {
+        if (this.props.date.isSame(moment(), 'day')) {
           this.setState({ time: utils.timeInHours() })
         }
       },
@@ -28,29 +33,54 @@ class Day extends React.Component {
     );
   }
 
+  calculateDateFromMousePosition(e, roundFn=Math.round) {
+    let { date, getMousePosition } = this.props;
+    let position = getMousePosition(e);
+    let hour = roundFn(position / hourCellHeight * 2) / 2;
+    let minutes = roundFn((hour % 1) * 60);
+
+    return moment(date).hour(hour).minutes(minutes).seconds(0).milliseconds(0);
+  }
+
   componentWillUnmount() {
     clearInterval(this.timerID);
   }
 
-  onClick(e) {
-    let { date, getMousePosition } = this.props;
-    let position = getMousePosition(e);
+  onMouseDown(e) {
+    let dateAtMouse = this.calculateDateFromMousePosition(e, Math.floor);
+    this.setState({
+      mouseDownStart: dateAtMouse,
+      mouseDownCurr: moment(dateAtMouse).add(1, 'hour')
+    });
+  }
 
-    let startHour = Math.floor(position / hourCellHeight * 2) / 2;
-    let startDate = new Date(
-      date.getFullYear(), date.getMonth(), date.getDate(),
-      startHour, (startHour % 1) * 60);
-    let endDate = new Date(
-      date.getFullYear(), date.getMonth(), date.getDate(),
-      startHour + 1, ((startHour + 1) % 1) * 60);
+  onMouseMove(e) {
+    if (this.state.mouseDownStart != null) {
+      let dateAtMouse = this.calculateDateFromMousePosition(e);
+      let start = this.state.mouseDownStart;
+
+      if (Math.abs(dateAtMouse - start) >= moment.duration(30, 'minutes')) {
+        this.setState({ mouseDownCurr: dateAtMouse });
+      } else {
+        this.setState({ mouseDownCurr: moment(start).add(30, 'minutes') });
+      }
+    }
+  }
+
+  onMouseUp(e) {
+    let { mouseDownStart, mouseDownCurr } = this.state;
     let newId = utils.uuid();
+    let start = moment(Math.min(mouseDownStart, mouseDownCurr));
+    let end = moment(Math.max(mouseDownStart, mouseDownCurr));
+
+    this.setState({ mouseDownStart: null, mouseDownCurr: null });
 
     EventActions.create({
       calendarId: this.props.primaryCal,
       id: newId,
       summary: '',
-      start: startDate,
-      end: endDate,
+      start: start,
+      end: end,
       synced: { google: false },
       location: ''
     });
@@ -62,25 +92,15 @@ class Day extends React.Component {
     let position = getMousePosition(e);
 
     let startHour = position / hourCellHeight;
-    let startDate = new Date(
-      date.getFullYear(), date.getMonth(), date.getDate(),
-      startHour, (startHour % 1) * 60);
-
+    let startDate = moment(date).hours(startHour).minutes((startHour % 1) * 60)
+                                .seconds(0).milliseconds(0);
     this.props.onDrop(startDate);
   }
 
-  render() {
-    let { events, date, timeFinder } = this.props;
-    let today = !utils.compareDates(date, new Date());
-    let clazz = 'calendar-day' + (today ? ' today' : '');
-
-    let eventsForToday = events
-      .toList()
-      .filter((event) => !utils.compareDates(event.get('start'), date))
-      .filter((event) => !event.get('allDay'));
-
-    let calEvents = utils.events
-      .reconcile(eventsForToday)
+  // Render all existing events
+  renderEvents(events) {
+    return utils.events
+      .reconcile(events)
       .map(({event, left, size}, i) => (
 
         <CalEvent
@@ -92,12 +112,15 @@ class Day extends React.Component {
           getMousePosition={this.props.getMousePosition} />
 
       ));
+  }
 
-    let potentialEvents = [];
+  // Render all available time blocks if the timefinder is active
+  renderTimeFinderBlocks(events) {
+    let timeFinder = this.props.timeFinder;
 
     if (this.props.timeFinder.get('isSearching')) {
-      potentialEvents = utils.events.findTime(
-        eventsForToday, timeFinder.get('hours'),
+      return utils.events.findTime(
+        events, timeFinder.get('hours'),
         timeFinder.get('timeMin'), timeFinder.get('timeMax')
       ).toJSON().map((time, i) => (
 
@@ -110,16 +133,57 @@ class Day extends React.Component {
 
       ));
     }
+    return [];
+  }
+
+  // If the user's mouse is down on the day (and nothing else), render a fake
+  // event to represent where the new event will go once the user releases
+  // the mouse
+  renderNewEvent() {
+    if (this.state.mouseDownStart == null) {
+      return '';
+    }
+    let start = this.state.mouseDownStart;
+    let end = this.state.mouseDownCurr;
+    let event = Map({
+      start: moment(Math.min(start, end)),
+      end: moment(Math.max(start, end))
+    });
+    return (
+      <CalEvent
+        event={event}
+        noDrag={true}
+      />
+    )
+  }
+
+  render() {
+    let { events, date } = this.props;
+    let today = date.isSame(moment(), 'day');
+    let clazz = 'calendar-day' + (today ? ' today' : '');
+
+    let eventsForToday = events
+      .toList()
+      .filter((event) => moment(event.get('start')).isSame(date, 'day'))
+      .filter((event) => !event.get('allDay'));
+
+    let calEvents = this.renderEvents(eventsForToday);
+    let potentialEvents = this.renderTimeFinderBlocks(eventsForToday);
+    let newEvent = this.renderNewEvent();
 
     return (
       <div
+        ref="self"
         className={clazz}
-        onClick={this.onClick.bind(this)} ref="self"
+        onMouseDown={this.onMouseDown.bind(this)}
+        onMouseMove={this.onMouseMove.bind(this)}
+        onMouseUp={this.onMouseUp.bind(this)}
         onDrop={this.onDrop.bind(this)}
         onDragOver={(e) => e.preventDefault()}
       >
         {calEvents}
         {potentialEvents}
+        {newEvent}
         {today ?
           <div
             className="current-time-marker"

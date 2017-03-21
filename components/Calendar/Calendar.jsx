@@ -16,7 +16,7 @@ class Calendar extends React.Component {
     super(props);
     this.state = {
       viewType: ViewTypes.WEEK,
-      focusDate: new Date(),
+      focusDate: moment(),
       dragging: null,
       dragOffset: null
     };
@@ -34,22 +34,12 @@ class Calendar extends React.Component {
     EventActions.finishEditing(event);
   }
 
-  moveForward() {
-    let {focusDate, viewType} = this.state;
-    let newFocusDate = new Date(+focusDate + time.days(viewType.delta));
-    let timeMax = new Date(+focusDate + 2*time.days(viewType.delta));
-
-    this.setState({ focusDate: newFocusDate });
-    providers.google.getEvents(focusDate.toISOString(), timeMax.toISOString());
-  }
-
-  moveBackward() {
-    let { focusDate, viewType } = this.state;
-    let newFocusDate = new Date(+focusDate - time.days(viewType.delta));
-    let timeMin = new Date(+focusDate - 2*time.days(viewType.delta));
-
-    this.setState({ focusDate: newFocusDate });
-    providers.google.getEvents(timeMin.toISOString(), focusDate.toISOString());
+  setFocusDate(date) {
+    let { viewType } = this.state;
+    let timeMin = moment(moment(date) - time.days(viewType.delta));
+    let timeMax = moment(moment(date) + time.days(viewType.delta));
+    this.setState({ focusDate: date });
+    providers.google.getEvents(timeMin.toISOString(), timeMax.toISOString());
   }
 
   onChangeViewType(viewType) {
@@ -57,25 +47,25 @@ class Calendar extends React.Component {
   }
 
   onDragStart(event, startDate) {
-    let start = new Date(event.get('start'));
+    let start = moment(event.get('start'));
     this.setState({ dragging: event, dragOffset: startDate - start });
   }
 
-  // TODO: convert to moment()
   onDrop(newStartDate) {
     let event = this.state.dragging;
     if (!event) {
       return;
     }
-    let startDate = new Date(event.get('start'));
-    let endDate = new Date(event.get('end'));
+    let startDate = moment(event.get('start'));
+    let endDate = moment(event.get('end'));
     let eventLength = endDate - startDate;
-    let minutes = startDate.getMinutes();
+    let minutes = startDate.minutes();
 
-    newStartDate = new Date(newStartDate - this.state.dragOffset);
-    let roundMins = Math.round((newStartDate.getMinutes() - minutes) / 30) * 30;
-    newStartDate.setMinutes(minutes + roundMins);
-    let newEndDate = new Date(+newStartDate + eventLength);
+    newStartDate = moment(newStartDate - this.state.dragOffset);
+    let roundMins = Math.round((newStartDate.minutes() - minutes) / 30) * 30;
+    newStartDate.minutes(minutes + roundMins);
+    let newEndDate = moment(newStartDate + eventLength);
+
 
     let originalEvent = this.props.events.get(event.get('originalEvent'));
     if (originalEvent != null) {
@@ -94,16 +84,24 @@ class Calendar extends React.Component {
 
   render() {
     let { View } = this.state.viewType;
+    let { colors } = this.props;
     let visibleCals = this
       .props.calendars
       .filter((cal) => cal.get('visible'));
 
-    // Filter out events on hidden calendars
+    // Filter out events on hidden calendars and set default colors
     let events = this
       .props.events
       .filter((event) => visibleCals.has(event.get('calendarId')))
-      .map((event) => event.set(
-        'color', visibleCals.getIn([event.get('calendarId'), 'color'])));
+      .map((event) => event
+        .set('defaultFgColor', visibleCals.getIn(
+          [event.get('calendarId'), 'fgColor']))
+        .set('defaultBgColor', visibleCals.getIn(
+          [event.get('calendarId'), 'bgColor']))
+        .set('bgColor', colors.getIn(
+          [event.get('colorId'), 'background']))
+        .set('fgColor', colors.getIn(
+          [event.get('colorId'), 'foreground'])));
 
     // Create fake instance for recurring events
     events = utils.events.createPseudoEvents(events);
@@ -114,6 +112,7 @@ class Calendar extends React.Component {
                    ? <EventModal
                        event={modalEvent}
                        calendars={this.props.calendars}
+                       colors={colors}
                        dismiss={this.dismissModal.bind(this)} />
                    : null;
     let timeFinderModal = this.props.timeFinder.get('isOpen')
@@ -127,8 +126,8 @@ class Calendar extends React.Component {
       <section className="calendar-container">
         <CalendarHeader
           currentViewType={this.state.viewType}
-          moveForward={this.moveForward.bind(this)}
-          moveBackward={this.moveBackward.bind(this)}
+          currentFocusDate={this.state.focusDate}
+          setFocusDate={this.setFocusDate.bind(this)}
           onChangeViewType={this.onChangeViewType.bind(this)}
           timeFinder={this.props.timeFinder}
         />

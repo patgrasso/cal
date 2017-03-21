@@ -15,11 +15,12 @@ class TimeFinderModal extends React.Component {
 
     this.state = { timeMin, timeMax, summary };
     this.state.hours = Math.floor(hours);
-    this.state.minutes = (hours % 1) * 60;
+    this.state.minutes = Math.round((hours % 1) * 60);
   }
 
   componentDidMount() {
-    this.refs.summary.focus();
+    this.refs.hours.focus();
+    this.refs.hours.select();
   }
 
   onChangeSummary(e) {
@@ -63,19 +64,12 @@ class TimeFinderModal extends React.Component {
         width="20%"
         height="20%"
       >
-        <h2>Find time for...</h2>
+        <h2>Find Time</h2>
 
-        <div className="tf-detail">
-          <label>Name</label>
-          <input
-            ref="summary"
-            type="text"
-            value={this.state.summary}
-            onChange={this.onChangeSummary.bind(this)} />
-        </div>
         <div className="tf-detail">
           <label>Duration</label>
           <input
+            ref="hours"
             className="time-input"
             type="text"
             value={this.state.hours}
@@ -86,6 +80,15 @@ class TimeFinderModal extends React.Component {
             type="text"
             value={this.state.minutes}
             onChange={this.onChangeMinutes.bind(this)} />
+        </div>
+
+        <div className="tf-detail">
+          <label>Name</label>
+          <input
+            ref="summary"
+            type="text"
+            value={this.state.summary}
+            onChange={this.onChangeSummary.bind(this)} />
         </div>
 
         <div className="modal-actions">

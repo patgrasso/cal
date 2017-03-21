@@ -7,6 +7,9 @@ import { ReduceStore } from 'flux/utils';
 
 const LOCAL_STORAGE_KEY = 'timeFinder';
 
+const DEFAULT_SUMMARY = 'Homework';
+const DEFAULT_HOURS = 2;
+
 class TimeFinderStore extends ReduceStore {
 
   constructor() {
@@ -18,8 +21,8 @@ class TimeFinderStore extends ReduceStore {
     return Map({
       isOpen: false,
       isSearching: false,
-      summary: '',
-      hours: 0,
+      summary: DEFAULT_SUMMARY,
+      hours: DEFAULT_HOURS,
       timeMin: null,
       timeMax: null
     }).mergeDeep(stored);

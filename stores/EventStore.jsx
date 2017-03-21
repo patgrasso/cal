@@ -8,6 +8,7 @@ import { ReduceStore } from 'flux/utils';
 
 const EVENTS  = 'events';
 const EDITING = 'editing';
+const COLORS = 'colors';
 const TIME_FINDER_HOURS = 'timeFinderHours';
 
 class EventStore extends ReduceStore {
@@ -17,7 +18,7 @@ class EventStore extends ReduceStore {
   }
 
   getInitialState() {
-    return Map({ events: Map(), editing: null });
+    return Map({ events: Map(), editing: null, colors: Map() });
   }
 
   reduce(state, action) {
@@ -47,6 +48,9 @@ class EventStore extends ReduceStore {
 
       case ProviderActionTypes.REMOVE_EVENT:
         return state.deleteIn([EVENTS, action.event.id]);
+
+      case ProviderActionTypes.SET_COLORS:
+        return state.set(COLORS, fromJS(action.colors));
 
 
       // user actions
@@ -89,6 +93,7 @@ class EventStore extends ReduceStore {
 
       case EventActionTypes.CLEAR_TIME_FINDER:
         return state.set(TIME_FINDER_HOURS, null);
+
 
       default:
         return state;

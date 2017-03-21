@@ -1,25 +1,10 @@
 import React from 'react';
 import Day from './Day';
 import HourColumn from './HourColumn';
+import moment from 'moment-timezone';
 import utils from '../../utils';
 
 import './WeekView.styl';
-
-const dayNames = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday"
-];
-
-const getDateForDay = (i, focusDate) => {
-  let date = new Date(focusDate);
-  date.setDate(date.getDate() - date.getDay() + i);
-  return date;
-};
 
 const filterEventsByDate = (events, date) => {
   return events.filter(({start}) => start.toDateString() === date.toDateString);
@@ -35,23 +20,27 @@ class WeekView extends React.Component {
   getMousePosition(e) {
     let viewTop = this.refs.body.getBoundingClientRect().top;
     let scrollTop = this.refs.body.scrollTop;
-    return e.pageY - viewTop + scrollTop;
+    let clientY = (e.clientY === 0)
+                ? document.__dragMousePosition.clientY
+                : e.clientY;
+
+    return clientY - viewTop + scrollTop;
   }
 
   render() {
-    let {focusDate, events, primaryCal} = this.props;
-    let dayHeaders = dayNames.map((name, i) => {
-      let date = getDateForDay(i, focusDate);
+    let { focusDate, primaryCal, events } = this.props;
+    let dayHeaders = utils.range(7).map((i) => {
+      let date = moment(focusDate).days(i);
       return (
         <div className="calendar-day-header" key={i}>
-          {name} {date.getMonth() + 1}/{date.getDate()}
+          {moment.weekdays(i)} {date.month() + 1}/{date.date()}
         </div>
       );
     });
 
     let dayColumns = utils.range(7).map((i) => (
       <Day
-        date={getDateForDay(i, focusDate)}
+        date={moment(focusDate).days(i)}
         primaryCal={primaryCal}
         events={events}
         timeFinder={this.props.timeFinder}

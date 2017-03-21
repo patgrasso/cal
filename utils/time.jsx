@@ -1,3 +1,7 @@
+// TODO: redo with moment.js
+// TODO: es6 exports
+
+const moment = require('moment-timezone');
 
 const ONE_DAY   = 86400000;
 const TZ_OFFSET = new Date().getTimezoneOffset() * 60000;
@@ -55,6 +59,10 @@ module.exports.endOfWeek = () => {
   return d.toISOString();
 };
 
-module.exports.days = (days) => {
-  return ONE_DAY * days;
-};
+module.exports.days = (days) => ONE_DAY * days;
+
+module.exports.startOfNextInterval = (minutes=60) => {
+  let now = moment();
+  return now.add(minutes - (now.minutes() % minutes), 'minutes')
+            .seconds(0).milliseconds(0);
+}

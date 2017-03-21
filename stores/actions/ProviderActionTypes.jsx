@@ -6,7 +6,9 @@ const ProviderActionTypes = {
   // EventStore
   UPDATE_EVENTS: 'PROVIDER_UPDATE_EVENTS',
   CREATE_EVENT: 'PROVIDER_CREATE_EVENT',
-  REMOVE_EVENT: 'PROVIDER_REMOVE_EVENT'
+  REMOVE_EVENT: 'PROVIDER_REMOVE_EVENT',
+
+  SET_COLORS: 'SET_COLORS'
 };
 
 export default ProviderActionTypes;

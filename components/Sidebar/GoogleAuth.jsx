@@ -53,6 +53,7 @@ class GoogleAuth extends React.Component {
   updateCalendar() {
     GoogleProvider.getCalendarList();
     GoogleProvider.getEvents();
+    GoogleProvider.getColors();
   }
 
   render() {

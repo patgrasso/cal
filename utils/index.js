@@ -27,3 +27,9 @@ module.exports.events = require('./events.jsx');
 Object.assign(module.exports, require('./time.jsx'));
 
 module.exports.uuid = () => uuid().replace(/-/g, '');
+
+module.exports.hexToRGB = (hex) => ([
+  parseInt(hex.replace('#', '').slice(0, 2), 16),
+  parseInt(hex.replace('#', '').slice(2, 4), 16),
+  parseInt(hex.replace('#', '').slice(4, 6), 16)
+]);

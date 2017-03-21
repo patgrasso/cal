@@ -1,26 +1,27 @@
 import React from 'react';
 import EventActions from '../../stores/actions/EventActions';
-import { hourCellHeight } from './CalendarConstants';
 import utils from '../../utils';
+import moment from 'moment-timezone';
+import { hourCellHeight, maxEventWidth } from './CalendarConstants';
 
 import './CalEvent.styl';
+
 
 class CalEvent extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { resizing: false, temporaryEnd: null };
+    this.state = { temporaryEnd: null };
   }
 
   calculateDateFromMousePosition(e) {
-    let date = new Date(this.props.event.get('start'));
-    let { getMousePosition }= this.props;
+    let date = moment(this.props.event.get('start'));
+    let { getMousePosition } = this.props;
     let position = getMousePosition(e);
     let hour = position / hourCellHeight;
 
-    return new Date(
-      date.getFullYear(), date.getMonth(), date.getDate(),
-      hour, (hour % 1) * 60);
+    return moment(date).hours(hour).minutes((hour % 1) * 60)
+                       .seconds(0).milliseconds(0);
   }
 
   onClick(e) {
@@ -30,58 +31,85 @@ class CalEvent extends React.Component {
 
   onDragStart(e) {
     let startDate = this.calculateDateFromMousePosition(e);
+    e.dataTransfer.setData('text', '');
     this.props.onDragStart(this.props.event, startDate);
   }
 
   onResizeStart(e) {
-    //e.dataTransfer.setDragImage(document.querySelector('#blank'), 0, 0);
     e.stopPropagation();
+    e.dataTransfer.setData('text', '');
+    this.onResize(e);
   }
 
   onResize(e) {
     let tempEnd = this.calculateDateFromMousePosition(e);
-    let minutes = tempEnd.getMinutes();
+    let minutes = tempEnd.minutes();
 
-    tempEnd.setMinutes(Math.round(minutes / 30) * 30);
+    tempEnd.minutes(Math.round(minutes / 30) * 30);
     this.setState({ temporaryEnd: tempEnd });
   }
 
   onResizeEnd(e) {
     let tempEnd = this.calculateDateFromMousePosition(e);
-    let minutes = tempEnd.getMinutes();
+    let minutes = tempEnd.minutes();
 
-    tempEnd.setMinutes(Math.round(minutes / 30) * 30);
+    tempEnd.minutes(Math.round(minutes / 30) * 30);
     EventActions.update(
       this.props.event
           .set('end', tempEnd)
           .toJSON());
-    this.setState({ temporaryEnd: null, resizing: false });
+    this.setState({ temporaryEnd: null });
   }
 
   render() {
-    let { start, end, summary, color, location } = this.props.event.toJSON();
+    let { event } = this.props;
+    let { start, end, summary, location } = event.toJSON();
+    let { defaultBgColor, defaultFgColor, bgColor, fgColor } = event.toJSON();
     let { left, size } = this.props;
-    let timeStart = utils.timeInHours(start);
-    let timeEnd = utils.timeInHours(this.state.temporaryEnd || end);
-    let pxFromTop = timeStart * hourCellHeight - 1;
-    let pxHeight = (timeEnd - timeStart) * hourCellHeight - 4;
-    let clazz = 'calendar-event' + (new Date(end) < Date.now() ? ' past' : '');
-    let allSyncedUp = this.props.event.get('synced').every((synced) => synced);
 
     end = this.state.temporaryEnd || end;
+    console.log(end, utils.timeInHours(end));
+
+    let timeStart = utils.timeInHours(start);
+    let timeEnd = utils.timeInHours(end);
+    let pxFromTop = timeStart * hourCellHeight - 1;
+    let pxHeight = (timeEnd - timeStart) * hourCellHeight - 4;
+    let pxWidth = 100 / ((size - 0.7) || 1);
+    let pxLeft = 100 / size * (left - 1);
+    let clazz = 'calendar-event' + (moment(end) < moment.now() ? ' past' : '');
+    let noDrag = this.props.noDrag;
+    let allSyncedUp = false;
+
+    bgColor = bgColor || defaultBgColor;
+    fgColor = fgColor || defaultFgColor;
+
+    if (this.props.event.has('synced')) {
+      allSyncedUp = this.props.event.get('synced').every((synced) => synced);
+    }
+
     pxHeight = Math.max(hourCellHeight / 2 - 4, pxHeight);
+    if (pxWidth + pxLeft > maxEventWidth) {
+      pxWidth = maxEventWidth - pxLeft;
+    }
+
+    let borderColor = (bgColor !== defaultBgColor) &&
+                      utils.hexToRGB(defaultBgColor).concat(1);
 
     return (
       <div
         className={clazz}
-        style={{backgroundColor: color,
+        style={{backgroundColor: bgColor,
+                color: fgColor,
+                borderColor: borderColor && `rgba(${borderColor.join(',')})`,
                 top: pxFromTop,
                 height: pxHeight,
-                left: (100 / size * (left - 1)) + '%',
-                width: (100 / ((size - 1) || 1)) + '%',
+                left: pxLeft + '%',
+                width: pxWidth + '%',
                 zIndex: left}}
+        onMouseDown={(e) => e.stopPropagation()}
+        onMouseUp={noDrag ? null : (e) => e.stopPropagation()}
         onClick={this.onClick.bind(this)}
-        draggable="true"
+        draggable={!noDrag}
         ref="self"
         onDragStart={this.onDragStart.bind(this)}
       >
@@ -90,13 +118,14 @@ class CalEvent extends React.Component {
         <i className="synced fa fa-refresh" hidden={allSyncedUp ? true : false}></i>
         <p className="summary">{summary}</p>
         <p className="location">{location}</p>
-        <div
-          draggable="true"
-          className="resize-handle"
-          onDragStart={this.onResizeStart.bind(this)}
-          onDrag={this.onResize.bind(this)}
-          onDragEnd={this.onResizeEnd.bind(this)}
-        ></div>
+        {noDrag ? '' :
+         <div
+           draggable="true"
+           className="resize-handle"
+           onDragStart={this.onResizeStart.bind(this)}
+           onDrag={this.onResize.bind(this)}
+           onDragEnd={this.onResizeEnd.bind(this)}
+         ></div>}
       </div>
     );
   }

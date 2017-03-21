@@ -1,6 +1,8 @@
 import React from 'react';
 import ViewTypes from './CalendarViewTypes';
 import TimeFinderActions from '../../stores/actions/TimeFinderActions';
+import time from '../../utils/time';
+import moment from 'moment-timezone';
 
 import './CalendarHeader.styl';
 
@@ -23,6 +25,20 @@ class CalendarHeader extends React.Component {
     this.props.onChangeViewType(viewType);
   }
 
+  moveForward() {
+    let { currentViewType: viewType,
+          currentFocusDate: focusDate } = this.props;
+    let newFocusDate = moment(moment(focusDate) + time.days(viewType.delta));
+    this.props.setFocusDate(newFocusDate);
+  }
+
+  moveBackward() {
+    let { currentViewType: viewType,
+          currentFocusDate: focusDate } = this.props;
+    let newFocusDate = moment(moment(focusDate) - time.days(viewType.delta));
+    this.props.setFocusDate(newFocusDate);
+  }
+
   render() {
     let { currentViewType: viewType } = this.props;
     let timeFinderState = TF_STATES[
@@ -40,11 +56,11 @@ class CalendarHeader extends React.Component {
         <div className="movement-buttons">
           <button
             className="move-backward"
-            onClick={this.props.moveBackward}
+            onClick={this.moveBackward.bind(this)}
           ><i className="fa fa-arrow-left"></i></button>
           <button
             className="move-forward"
-            onClick={this.props.moveForward}
+            onClick={this.moveForward.bind(this)}
           ><i className="fa fa-arrow-right"></i></button>
         </div>
 

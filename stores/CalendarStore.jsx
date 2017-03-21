@@ -38,7 +38,6 @@ class CalendarStore extends ReduceStore {
 
         return state.mergeIn([CALENDAR_LIST], calendarList)
                     .set(PRIMARY_CAL, primaryCal && primaryCal.get('id'));
-        return state;
 
       case ProviderActionTypes.CREATE_CALENDAR:
         // create immutable

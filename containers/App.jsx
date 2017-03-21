@@ -23,3 +23,17 @@ class App extends React.Component {
 }
 
 render(<App/>, document.getElementById('app'));
+
+let dragPosition = document.__dragMousePosition = {
+  clientX: 0,
+  clientY: 0
+};
+
+document.addEventListener('dragover', (e) => {
+  dragPosition.clientX = e.clientX;
+  dragPosition.clientY = e.clientY;
+});
+document.addEventListener('mousedown', (e) => {
+  dragPosition.clientX = e.clientX;
+  dragPosition.clientY = e.clientY;
+});

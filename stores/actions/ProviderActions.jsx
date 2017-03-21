@@ -40,6 +40,14 @@ const ProviderActions = {
       provider,
       event
     });
+  },
+
+  setColors(provider, colors) {
+    Dispatcher.dispatch({
+      type: ProviderActionTypes.SET_COLORS,
+      provider,
+      colors
+    });
   }
 };
 

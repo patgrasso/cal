@@ -5,11 +5,11 @@ import './Checkbox.styl';
 class Checkbox extends React.Component {
 
   onChange(e) {
-    this.props.onChange(this.props.id || this.props.name, !this.props.visible);
+    this.props.onChange(this.props.id || this.props.text, !this.props.visible);
   }
 
   render() {
-    let {color, name, visible} = this.props;
+    let { color, visible } = this.props;
     return (
       <li className="checkbox" onClick={this.onChange.bind(this)}>
         <div
@@ -17,7 +17,7 @@ class Checkbox extends React.Component {
           style={{backgroundColor: visible ? color : '',
                   borderColor: visible ? color : ''}}
         />
-        <span>{name}</span>
+        <span>{this.props.children}</span>
       </li>
     );
   }

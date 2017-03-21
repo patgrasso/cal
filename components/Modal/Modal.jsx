@@ -16,7 +16,7 @@ class Modal extends React.Component {
   }
 
   render() {
-    let { color, className, width } = this.props;
+    let { fgColor, bgColor, className, width } = this.props;
 
     className = 'modal' + (className ? ' ' + className : '');
 
@@ -24,7 +24,8 @@ class Modal extends React.Component {
       <div className={className} onClick={this.props.onCancel}>
         <div
           className="modal-body"
-          style={{backgroundColor: color,
+          style={{backgroundColor: bgColor,
+                  color: fgColor,
                   width}}
           onClick={this.onClick.bind(this)}
           onKeyDown={this.onKeyPress.bind(this)}

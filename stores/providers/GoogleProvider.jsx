@@ -3,6 +3,7 @@ import ProviderActions from '../actions/ProviderActions';
 import time from '../../utils/time';
 import utils from '../../utils';
 import moment from 'moment-timezone';
+import { colors } from '../../components/Calendar/CalendarConstants';
 import { Map, fromJS } from 'immutable';
 
 const CALENDAR_LIST = 'calendarList';
@@ -53,6 +54,15 @@ class GoogleProvider extends Provider {
     this._cachedCalendarList = null;
   }
 
+  getColors() {
+    return new Promise((resolve, reject) => {
+      gapi.client.calendar.colors.get().then(({result}) => {
+        ProviderActions.setColors(PROVIDER_NAME, result.event);
+        resolve(result.event);
+      }, (error) => reject(error));
+    });
+  }
+
   _getCachedCalendarList() {
     if (this._cachedCalendarList) {
       return Promise.resolve(this._cachedCalendarList);
@@ -63,21 +73,19 @@ class GoogleProvider extends Provider {
 
   getCalendarList() {
     return new Promise((resolve, reject) => {
-      gapi.client.calendar.calendarList.list().then(
-        ({result}) => {
-          let calendarList = result.items.map((item) => ({
-            id: item.id,
-            name: item.summary,
-            visible: true,
-            primary: item.primary,
-            accessRole: item.accessRole,
-            color: item.backgroundColor
-          }));
-          ProviderActions.updateCalendarList(PROVIDER_NAME, calendarList);
-          resolve(calendarList);
-        },
-        (error) => reject(error)
-      );
+      gapi.client.calendar.calendarList.list().then(({result}) => {
+        let calendarList = result.items.map((item) => ({
+          id: item.id,
+          name: item.summary,
+          visible: true,
+          primary: item.primary,
+          accessRole: item.accessRole,
+          bgColor: item.backgroundColor,
+          fgColor: item.foregroundColor
+        }));
+        ProviderActions.updateCalendarList(PROVIDER_NAME, calendarList);
+        resolve(calendarList);
+      }, (error) => reject(error));
     });
   }
 
@@ -115,7 +123,8 @@ class GoogleProvider extends Provider {
                 end: endTime,
                 location: item.location,
                 recurrence,
-                synced: { google: true }
+                synced: { google: true },
+                colorId: item.colorId
               };
             });
 
@@ -166,7 +175,8 @@ class GoogleProvider extends Provider {
         start,
         end,
         summary: event.summary,
-        location: event.location
+        location: event.location,
+        colorId: event.colorId
       }).then((response) => {
         ProviderActions.createEvent(PROVIDER_NAME, event);
         resolve(event);

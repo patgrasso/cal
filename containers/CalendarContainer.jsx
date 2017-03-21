@@ -18,6 +18,7 @@ class CalendarContainer extends React.Component {
       calendars: CalendarStore.getState().get('calendarList'),
       primaryCal: CalendarStore.getState().get('primaryCal'),
       events: EventStore.getState().get('events'),
+      colors: EventStore.getState().get('colors'),
       timeFinder: TimeFinderStore.getState(),
       currentlyEditing: EventStore.getState().get('editing'),
       createEvent: EventActions.create,
