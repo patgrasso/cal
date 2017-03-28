@@ -34217,15 +34217,7 @@ if(false) {
 
 module.exports = {
 	"web": {
-		"client_id": "963613204311-051cioqhsf726kbtukcv2avsvg8lruhf.apps.googleusercontent.com",
-		"project_id": "corded-dragon-161618",
-		"auth_uri": "https://accounts.google.com/o/oauth2/auth",
-		"token_uri": "https://accounts.google.com/o/oauth2/token",
-		"auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-		"client_secret": "oUn5ZUqw4hmRkGdFvYfgUfmf",
-		"javascript_origins": [
-			"http://localhost:8080"
-		]
+		"client_id": "963613204311-k7hn8qp57d659pfummgj9d8d8ffjgaoj.apps.googleusercontent.com"
 	}
 };
 
