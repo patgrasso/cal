@@ -1,0 +1,38 @@
+
+@import '../colors'
+
+.color-picker
+  width: fit-content
+  padding: 4px
+  border-radius: 3px
+
+  .color-picker-swatch
+    height: 15px
+    width: 15px
+    display: inline-block
+    border-radius: 3px
+    margin-right: 5px
+    position: relative
+    cursor: pointer
+    border: 1px solid grey
+
+    &.active:after
+      content: ''
+      background-color: #fff
+      position: absolute
+      width: 5px
+      top: 8px
+      left: 2px
+      height: 2px
+      transform: rotateZ(45deg)
+
+    &.active:before
+      content: ''
+      background-color: #fff
+      position: absolute
+      width: 9px
+      top: 7px
+      left: 4px
+      height: 2px
+      transform: rotateZ(-45deg)
+

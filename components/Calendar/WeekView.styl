@@ -1,5 +1,6 @@
 
-@import "../_constants"
+json('../constants.json')
+@import '../colors'
 
 .calendar-weekview, .calendar-dayview
   height: calc(100% - 50px)
@@ -10,7 +11,7 @@
   header
     display: flex
     flex-direction: row
-    margin-left: hour-column-width
+    margin-left: unit(hourColumnWidth, px)
 
   .calendar-body
     flex-basis: 100%

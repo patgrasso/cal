@@ -1,0 +1,77 @@
+
+@import '../colors'
+json('../constants.json')
+
+.dt-picker
+  .dt-time-picker
+    width: 200px
+
+    header
+      text-align: right
+      .active
+        color: fg-primary
+
+      time
+        font-size: 34px
+        line-height: 50px
+        cursor: pointer
+
+      .period
+        display: inline-block
+        margin-right: 30px
+        margin-left: 10px
+        font-weight: 700
+
+        span
+          cursor: pointer
+          display: block
+          font-size: 12px
+
+    .clock
+      width: 200px
+      height: 200px
+      background-color: #fff
+
+      .clock-face
+        fill: grey200
+        r: clockRadius
+        cx: clockX
+        cy: clockY
+
+      .clock-center
+        fill: bg-primary
+        r: 3
+        cx: clockX
+        cy: clockY
+    
+      .marker
+        cursor: pointer
+        circle
+          fill: transparent
+          r: 12
+        text
+          text-anchor: middle
+        &:hover, &.hover
+          circle
+            fill: bg-primary
+          text
+            fill: fg-primary
+
+      .hand
+        stroke-width: 1
+        stroke: bg-primary
+        
+      .hand-end
+        r: 12
+        cursor: -webkit-grab
+        cursor:    -moz-grab
+        cursor:         grab
+        fill: transparent
+        stroke: bg-primary
+        stroke-width: 2
+
+        &.active
+          cursor: -webkit-grabbing
+          cursor:    -moz-grabbing
+          cursor:         grabbing
+          

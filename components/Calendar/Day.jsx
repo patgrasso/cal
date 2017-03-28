@@ -5,7 +5,7 @@ import utils from '../../utils';
 import EventActions from '../../stores/actions/EventActions';
 import moment from 'moment-timezone';
 import { Map } from 'immutable';
-import { hourCellHeight } from './CalendarConstants';
+import { hourCellHeight } from '../constants.json';
 
 const TIME_MARKER_UPDATE_MS = 60000;
 
@@ -105,6 +105,7 @@ class Day extends React.Component {
 
         <CalEvent
           event={event}
+          relativeDate={this.props.date}
           left={left}
           size={size}
           key={i}
@@ -149,12 +150,7 @@ class Day extends React.Component {
       start: moment(Math.min(start, end)),
       end: moment(Math.max(start, end))
     });
-    return (
-      <CalEvent
-        event={event}
-        noDrag={true}
-      />
-    )
+    return <CalEvent event={event} noDrag={true} />;
   }
 
   render() {
@@ -164,8 +160,12 @@ class Day extends React.Component {
 
     let eventsForToday = events
       .toList()
-      .filter((event) => moment(event.get('start')).isSame(date, 'day'))
+      .filter((event) => !utils.compareDates(event.get('start'), date))
+        //moment(event.get('start')).isSame(date, 'day'))// ||
+                         //moment(event.get('end')).isSame(date, 'day'))
       .filter((event) => !event.get('allDay'));
+
+    console.log(date.toString());
 
     let calEvents = this.renderEvents(eventsForToday);
     let potentialEvents = this.renderTimeFinderBlocks(eventsForToday);

@@ -1,0 +1,63 @@
+
+@import '../colors'
+
+.dt-picker
+  .dt-date-picker
+    width: 250px
+
+    header
+      overflow: hidden
+
+      time
+        margin-left: 20px
+        display: block
+
+      .year
+        margin-top: 5px
+        font-weight: 700
+        font-size: 12px
+
+      .date
+        font-size: 24px
+
+    content
+      .mini-calendar-header
+        display: flex
+        flex-direction: row
+        justify-content: space-between
+        align-items: center
+
+        button
+          outline: none
+          background-color: transparent
+          color: #000
+
+      table
+        table-layout: fixed
+        width: 100%
+
+      td
+        font-size: 12px
+        font-weight: 700
+        color: grey700
+        text-align: center
+        width: 32px
+        height: 32px
+        cursor: pointer
+        border-radius: 50%
+
+        &:hover
+          background-color: grey300
+
+        &.today
+          color: bg-primary
+
+        &.not-month
+          color: grey400
+
+        &.selected
+          background-color: bg-primary
+          color: fg-primary
+      
+      
+

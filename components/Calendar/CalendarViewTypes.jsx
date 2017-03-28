@@ -4,11 +4,11 @@ import WeekView from './WeekView';
 const CalendarViewTypes = {
   WEEK: {
     View: WeekView,
-    delta: 7
+    name: 'week'
   },
   DAY: {
     View: DayView,
-    delta: 1
+    name: 'day'
   }
 };
 

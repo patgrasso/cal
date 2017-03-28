@@ -1,0 +1,12 @@
+{
+  "hourCellHeight": 48,
+  "hourColumnWidth": 60,
+  "dayHeaderHeight": 54,
+  "headerHeight": 54,
+  "sidebarWidth": 200,
+  "maxEventWidth": 0.95,
+
+  "clockRadius": 90,
+  "clockX": 100,
+  "clockY": 100
+}

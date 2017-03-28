@@ -2,10 +2,9 @@ import React from 'react';
 import EventActions from '../../stores/actions/EventActions';
 import utils from '../../utils';
 import moment from 'moment-timezone';
-import { hourCellHeight, maxEventWidth } from './CalendarConstants';
+import { hourCellHeight, maxEventWidth } from '../constants.json';
 
 import './CalEvent.styl';
-
 
 class CalEvent extends React.Component {
 
@@ -62,16 +61,15 @@ class CalEvent extends React.Component {
   }
 
   render() {
-    let { event } = this.props;
+    let { event, relativeDate } = this.props;
     let { start, end, summary, location } = event.toJSON();
     let { defaultBgColor, defaultFgColor, bgColor, fgColor } = event.toJSON();
     let { left, size } = this.props;
 
     end = this.state.temporaryEnd || end;
-    console.log(end, utils.timeInHours(end));
 
-    let timeStart = utils.timeInHours(start);
-    let timeEnd = utils.timeInHours(end);
+    let timeStart = utils.timeInHours(start, relativeDate);
+    let timeEnd = utils.timeInHours(end, relativeDate);
     let pxFromTop = timeStart * hourCellHeight - 1;
     let pxHeight = (timeEnd - timeStart) * hourCellHeight - 4;
     let pxWidth = 100 / ((size - 0.7) || 1);
@@ -88,8 +86,8 @@ class CalEvent extends React.Component {
     }
 
     pxHeight = Math.max(hourCellHeight / 2 - 4, pxHeight);
-    if (pxWidth + pxLeft > maxEventWidth) {
-      pxWidth = maxEventWidth - pxLeft;
+    if (pxWidth + pxLeft > maxEventWidth * 100) {
+      pxWidth = 100 * maxEventWidth - pxLeft;
     }
 
     let borderColor = (bgColor !== defaultBgColor) &&

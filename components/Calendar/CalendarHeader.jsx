@@ -28,14 +28,14 @@ class CalendarHeader extends React.Component {
   moveForward() {
     let { currentViewType: viewType,
           currentFocusDate: focusDate } = this.props;
-    let newFocusDate = moment(moment(focusDate) + time.days(viewType.delta));
+    let newFocusDate = moment(focusDate).add(1, viewType.name);
     this.props.setFocusDate(newFocusDate);
   }
 
   moveBackward() {
     let { currentViewType: viewType,
           currentFocusDate: focusDate } = this.props;
-    let newFocusDate = moment(moment(focusDate) - time.days(viewType.delta));
+    let newFocusDate = moment(focusDate).subtract(1, viewType.name);
     this.props.setFocusDate(newFocusDate);
   }
 

@@ -62,10 +62,10 @@ function reconcile(events) {
 }
 
 
-const RECUR_INCREMENTS = {
-  WEEKLY: { weeks: 1 },
-  MONTHLY: { months: 1 },
-  DAILY: { days: 1 }
+const RECUR_NAMES = {
+  WEEKLY: 'weeks',
+  MONTHLY: 'months',
+  DAILY: 'days'
 };
 
 /**
@@ -73,7 +73,7 @@ const RECUR_INCREMENTS = {
  * event. They will be placed into the map with the original event's id appended
  * with a sub-identifier ({id}-1, {id}-2, etc.).
  */
-function createPseudoEvents(events) {
+function createPseudoEvents(events, fromDate, toDate) {
   let newEvents = Map();
 
   events.forEach((event, id) => {
@@ -84,13 +84,28 @@ function createPseudoEvents(events) {
     let recurEndDate, freq, i;
 
     if (recurrence) {
-      freq = recurrence.get('freq');
-      recurEndDate = moment(recurrence.get('until'));
+      freq = RECUR_NAMES[recurrence.get('freq')];
+      recurEndDate = recurrence.get('finite')
+                   ? moment(recurrence.get('until'))
+                   : Infinity;
 
-      currStartDate.add(RECUR_INCREMENTS[freq]);
-      currEndDate.add(RECUR_INCREMENTS[freq]);
+      let displacement = Math.ceil(
+        (fromDate - currStartDate) / moment.duration(1, freq));
 
-      for (i = 0; currStartDate < recurEndDate; i += 1) {
+      if (displacement > 0) {
+        currStartDate.add(displacement - 1, freq);
+        currEndDate.add(displacement - 1, freq);
+      }
+      console.log(
+        event.get('summary'), '|', event.get('start'), '|', currStartDate.toString(),
+        recurrence.toJSON()
+      );
+
+      for (
+        i = 0;
+        currStartDate < recurEndDate && currStartDate < toDate;
+        i += 1
+      ) {
         if (!exceptions.includes(currStartDate.toISOString())) {
           newEvents = newEvents.set(
             id + `:R${i}`, event.set('id', id + `:R${i}`)
@@ -99,11 +114,12 @@ function createPseudoEvents(events) {
                                 .set('originalEvent', id))
         }
 
-        currStartDate.add(RECUR_INCREMENTS[freq]);
-        currEndDate.add(RECUR_INCREMENTS[freq]);
+        currStartDate.add(1, freq);
+        currEndDate.add(1, freq);
       }
+    } else {
+      newEvents = newEvents.set(id, event);
     }
-    newEvents = newEvents.set(id, event);
   });
 
   return newEvents;
@@ -129,8 +145,7 @@ function findTime(events, hours, timeMin, timeMax) {
     end: moment(end)
   })).sort((a, b) => a.start > b.start);
 
-  let midnight = moment(events[0].start)
-    .hours(0).minutes(0).seconds(0).milliseconds(0);
+  let midnight = moment(events[0].start).startOf('day');
 
   // How about before the first event?
   end = events[0].start;

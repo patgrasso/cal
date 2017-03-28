@@ -33,3 +33,6 @@ module.exports.hexToRGB = (hex) => ([
   parseInt(hex.replace('#', '').slice(2, 4), 16),
   parseInt(hex.replace('#', '').slice(4, 6), 16)
 ]);
+
+module.exports.leftPad = (stuff, len, char=' ') =>
+  Array(len - (''+stuff).length + 1).join(char) + stuff;

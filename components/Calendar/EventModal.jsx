@@ -3,16 +3,19 @@ import utils from '../../utils';
 import Select from 'react-select';
 import DateTimePicker from '../DateTimePicker';
 import Checkbox from '../Checkbox';
+import DateTime from 'react-datetime';
 import providers from '../../stores/providers';
 import Modal from '../Modal';
 
-import { GithubPicker } from 'react-color';
+//import { GithubPicker } from 'react-color';
+import ColorPicker from '../ColorPicker';
 import { fromJS } from 'immutable';
 
 import EventActions from '../../stores/actions/EventActions';
 
 import './EventModal.styl';
 import 'style-loader!css-loader!react-select/dist/react-select.css';
+import 'style-loader!css-loader!react-datetime/css/react-datetime.css';
 
 class EventModal extends React.Component {
 
@@ -66,7 +69,7 @@ class EventModal extends React.Component {
     let { colors } = this.props;
 
     this.setState({ event: event.set(
-      'colorId', colors.findKey((c) => c.get('background') === color.hex)
+      'colorId', colors.findKey((c) => c.get('background') === color)
     )});
   }
 
@@ -89,7 +92,7 @@ class EventModal extends React.Component {
     let { calendars, colors } = this.props;
     let { event } = this.state;
     let { summary, start, end, location } = event.toJSON();
-    let { defaultBgColor, defaultFgColor, colorId } = event.toJSON();
+    let { colorId } = event.toJSON();
 
     let synced = this.state.event.get('synced').map(() => true);
     let numSynced = synced.size;
@@ -98,6 +101,9 @@ class EventModal extends React.Component {
       value: cal.get('id'),
       label: cal.get('name')
     })).toJSON();
+
+    let defaultBgColor = calendars.getIn([event.get('calendarId'), 'bgColor']);
+    let defaultFgColor = calendars.getIn([event.get('calendarId'), 'fgColor']);
 
     synced = unsynced.merge(synced);
     let bgColor = colors.getIn([colorId, 'background']) || defaultBgColor;
@@ -169,11 +175,9 @@ class EventModal extends React.Component {
 
         <div className="event-detail">
           <label>Color</label>
-          <GithubPicker
+          <ColorPicker
             color={bgColor}
-            width="fit-content"
             colors={colors.toList().map((c) => c.get('background')).toJSON()}
-            triangle="hide"
             onChange={this.onEventColorChanged.bind(this)} />
           <div
             className="color-swatch"

@@ -3,7 +3,6 @@ import ProviderActions from '../actions/ProviderActions';
 import time from '../../utils/time';
 import utils from '../../utils';
 import moment from 'moment-timezone';
-import { colors } from '../../components/Calendar/CalendarConstants';
 import { Map, fromJS } from 'immutable';
 
 const CALENDAR_LIST = 'calendarList';
@@ -21,6 +20,7 @@ const parseRecurrence = (recurrence, start) => {
   }
   recurrence = recurrence.reduce((rules, curr) => {
     let type = curr.match(/^(\w+)?/)[1];
+    let finite = true;
     let _, tz, dates, freq, endDate, count;
 
     switch (type) {
@@ -32,12 +32,19 @@ const parseRecurrence = (recurrence, start) => {
       case 'RRULE':
         if (/FREQ=(.*?);UNTIL=(.*?);/.test(curr)) {
           [_, freq, endDate] = curr.match(/FREQ=(.*?);UNTIL=(.*?);/);
-        }
-        if (/FREQ=(.*?);COUNT=(\d*?)/.test(curr)) {
+        } else if (/FREQ=(.*?);COUNT=(\d*?)/.test(curr)) {
           [_, freq, count] = curr.match(/FREQ=(.*?);COUNT=(\d*?)/);
           endDate = moment(start).add(parseInt(count), RECUR_QUALIFIERS[freq]);
+        } else if (/FREQ=(.*?);/.test(curr)) {
+          [_, freq] = curr.match(/FREQ=(.*?);/);
+          endDate = Infinity;
+          finite = false;
         }
-        return rules.set('freq', freq).set('until', moment(endDate).toDate());
+        rules = rules.set('freq', freq).set('finite', finite);
+        if (finite) {
+          return rules.set('until', moment(endDate).toDate());
+        }
+        return rules;
 
       default:
         return rules;
@@ -113,6 +120,11 @@ class GoogleProvider extends Provider {
               let startTime = new Date(item.start.dateTime || item.start.date);
               let endTime = new Date(item.end.dateTime || item.end.date);
               let recurrence = parseRecurrence(item.recurrence, startTime);
+
+              if (item.summary === 'Recur') {
+                console.log('~', item.summary, '~');
+                console.log(item.recurrence, recurrence);
+              }
 
               return {
                 calendarId,

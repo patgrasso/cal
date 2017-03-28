@@ -1,14 +1,15 @@
 
-@import "../_constants"
+json('../constants.json')
+@import '../colors'
 
 .calendar-hour-column
   width: 40px
-  flex-basis: hour-column-width
+  flex-basis: unit(hourColumnWidth, px)
   flex-grow: 0
   flex-shrink: 0
 
 .calendar-hour-cell
-  height: hour-cell-height - 1
+  height: unit(hourCellHeight - 1, px)
   border: 1px solid grey300
   border-left: none
   border-top: none

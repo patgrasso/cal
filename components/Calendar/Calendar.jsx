@@ -16,7 +16,7 @@ class Calendar extends React.Component {
     super(props);
     this.state = {
       viewType: ViewTypes.WEEK,
-      focusDate: moment(),
+      focusDate: moment().startOf('day'),
       dragging: null,
       dragOffset: null
     };
@@ -36,8 +36,8 @@ class Calendar extends React.Component {
 
   setFocusDate(date) {
     let { viewType } = this.state;
-    let timeMin = moment(moment(date) - time.days(viewType.delta));
-    let timeMax = moment(moment(date) + time.days(viewType.delta));
+    let timeMin = moment(date).startOf(viewType.name);
+    let timeMax = moment(date).endOf(viewType.name);
     this.setState({ focusDate: date });
     providers.google.getEvents(timeMin.toISOString(), timeMax.toISOString());
   }
@@ -66,7 +66,6 @@ class Calendar extends React.Component {
     newStartDate.minutes(minutes + roundMins);
     let newEndDate = moment(newStartDate + eventLength);
 
-
     let originalEvent = this.props.events.get(event.get('originalEvent'));
     if (originalEvent != null) {
       newStartDate = moment(originalEvent.get('start')).add(
@@ -83,11 +82,15 @@ class Calendar extends React.Component {
   }
 
   render() {
-    let { View } = this.state.viewType;
+    let { View, name: viewTypeName } = this.state.viewType;
     let { colors } = this.props;
+    let { focusDate } = this.state;
     let visibleCals = this
       .props.calendars
       .filter((cal) => cal.get('visible'));
+
+    // Make a copy, otherwise this gets changed
+    focusDate = moment(focusDate);
 
     // Filter out events on hidden calendars and set default colors
     let events = this
@@ -103,8 +106,9 @@ class Calendar extends React.Component {
         .set('fgColor', colors.getIn(
           [event.get('colorId'), 'foreground'])));
 
-    // Create fake instance for recurring events
-    events = utils.events.createPseudoEvents(events);
+    // Create fake instances for recurring events
+    events = utils.events.createPseudoEvents(
+      events, focusDate.startOf(viewTypeName), focusDate.endOf(viewTypeName));
 
     // Construct the event modal if need be
     let modalEvent = events.get(this.props.currentlyEditing);

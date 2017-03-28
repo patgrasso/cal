@@ -3,6 +3,7 @@ import Modal from '../Modal';
 import TimeFinderActions from '../../stores/actions/TimeFinderActions';
 import Select from 'react-select';
 import moment from 'moment-timezone';
+import utils from '../../utils';
 import { Map, List } from 'immutable';
 
 import './TimeFinderModal.styl';
@@ -28,7 +29,7 @@ class TimeFinderModal extends React.Component {
   }
 
   onChangeHours(e) {
-    this.setState({ hours: parseInt(e.target.value) || 0 });
+    this.setState({ hours: Math.min(parseInt(e.target.value), 24) || 0 });
   }
 
   onChangeMinutes(e) {
@@ -72,13 +73,13 @@ class TimeFinderModal extends React.Component {
             ref="hours"
             className="time-input"
             type="text"
-            value={this.state.hours}
+            value={utils.leftPad(this.state.hours, 2, 0)}
             onChange={this.onChangeHours.bind(this)} />
           :
           <input
             className="time-input"
             type="text"
-            value={this.state.minutes}
+            value={utils.leftPad(this.state.minutes, 2, 0)}
             onChange={this.onChangeMinutes.bind(this)} />
         </div>
 

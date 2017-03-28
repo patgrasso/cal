@@ -1,15 +1,16 @@
 
-@import "../_constants"
+json('../constants.json')
+@import '../colors'
 
 .calendar-day
   position: relative
   border-right: 1px solid grey300
-  height: hour-cell-height*24
+  height: unit(hourCellHeight*24, px)
   cursor: default
 
   background-image: linear-gradient(to right, #fff 1px, transparent 2px),
                     linear-gradient(to top, grey300 1px, transparent 1px)
-  background-size: 3px hour-cell-height*0.5
+  background-size: 3px unit(hourCellHeight*0.5, px)
   overflow: hidden;
 
   &:last-of-type, &:first-of-type
@@ -21,7 +22,7 @@
     height: 100%
     width: 100%
     background-image: linear-gradient(to top, grey300 1px, transparent 1px)
-    background-size: 1px hour-cell-height
+    background-size: 1px unit(hourCellHeight, px)
 
   &.today
     background-color: #eee
@@ -35,7 +36,7 @@
   position: relative
 
 .calendar-day-header
-  height: day-header-height
+  height: unit(dayHeaderHeight, px)
   text-align: center
 
 .current-time-marker

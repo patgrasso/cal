@@ -16,7 +16,12 @@ module.exports = {
   module: {
     loaders: [
       {
-        test: /\.jsx?/,
+        test: /\.json/,
+        include: [VIEWS_DIR, COMPONENTS_DIR],
+        loader: 'json-loader'
+      },
+      {
+        test: /\.jsx?$/,
         include: [VIEWS_DIR, COMPONENTS_DIR],
         loader: 'babel-loader'
       },

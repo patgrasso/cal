@@ -1,11 +1,11 @@
 
-@import "../_constants"
+json('../constants.json')
 
 .calendar-event
   position: absolute
   background-color: orange
   border: 1px solid rgba(0, 0, 0, 0.2)
-  max-width: 95%
+  max-width: percentage(maxEventWidth)
   z-index: 5
   overflow: hidden
   user-select: none

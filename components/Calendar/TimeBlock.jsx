@@ -1,7 +1,7 @@
 import React from 'react';
 import EventActions from '../../stores/actions/EventActions';
 import TimeFinderActions from '../../stores/actions/TimeFinderActions';
-import { hourCellHeight } from './CalendarConstants';
+import { hourCellHeight } from '../constants.json';
 import utils from '../../utils';
 
 import './TimeBlock.styl';

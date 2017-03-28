@@ -13,7 +13,7 @@ const filterEventsByDate = (events, date) => {
 class WeekView extends React.Component {
 
   componentDidMount() {
-    let {body} = this.refs;
+    let { body } = this.refs;
     body.scrollTop = (body.scrollHeight - body.clientHeight) / 2;
   }
 
